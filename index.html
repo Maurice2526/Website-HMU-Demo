@@ -26,6 +26,7 @@
     }
   </script>
 
+<!--Fade in / out Animation-->
   <style>
   @keyframes fadeOutPage {
     from { opacity: 1; }
@@ -36,9 +37,29 @@
     animation: fadeOutPage 0.5s forwards;
   }
 </style>
+<style>
+  /* Container um Input relativ positionieren */
+  .search-container {
+    position: relative;
+  }
+
+  /* Meldung absolut über dem Input*/
+  #search-message {
+    position: absolute;
+    top: 100%;       /* direkt unter dem Input */
+    left: 0;
+    width: 100%;
+    padding: 0.25rem 0.5rem;
+    color: #EF4444;  /* rot */
+    font-size: 0.875rem;
+    z-index: 10;
+    display: none;
+  }
+</style>
+
 </head>
 
-<body class="min-h-screen text-zinc-100 font-sans bg-zinc-950 flex flex-col">
+<body class="min-h-screen text-zinc-100 font-sans bg-[oklch(16%_0.042_265.755)] flex flex-col">
 
   <!-- Header -->
   <header class="px-8 py-6 border-b border-white/0">
@@ -55,26 +76,34 @@
   <!-- Main -->
   <main class="p-8 flex-1 flex flex-col items-center">
 
-  <!-- Suchleiste zentriert -->
-  <div class="w-full max-w-md mb-12">
-    <div class="relative text-zinc-400">
+<!-- Searchbar Container -->
+<div class="search-container w-full max-w-md mb-12">   
+  <input 
+      type="text" 
+      placeholder="Raum suchen..." 
+      class="w-full pl-10 pr-4 py-3 rounded-xl bg-[oklch(25%_0.041_260.031)] shadow-lg shadow-black/50 border border-white/10 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+      id="room-search">
+  
       <!-- Icon Lupe -->
       <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
         🔍
       </span>
-      <input 
-        type="text" 
-        placeholder="Raum suchen..." 
-        class="w-full pl-10 pr-4 py-3 rounded-xl bg-zinc-900 border border-white/10 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-        id="room-search"
-      >
-    </div>
-    <!-- Such-Vorschau -->
-      <div
-        id="search-results"
-        class="absolute w-full mt-2 bg-zinc-900 border border-white/10 rounded-xl overflow-hidden hidden z-50">
-    </div>
+
+  <!-- Suchergebnisse Dropdown -->
+  <div 
+    id="search-results" 
+    class="absolute top-full left-0 w-full bg-zinc-800 rounded-b-xl hidden shadow-lg z-50">
   </div>
+
+  <!-- Kein-Raum-Gefunden Meldung -->
+  <div 
+    id="search-message" 
+    class="hidden font-semibold px-2 py-1">
+    Kein Raum gefunden
+  </div>
+</div>
+
+
 
   <!-- Standort-Buttons horizontal zentriert -->
   <div class="flex flex-wrap justify-center gap-6 w-full max-w-6xl">
@@ -82,7 +111,7 @@
     <!-- Standort A -->
     <a href="StandortA.html" class="group relative w-64">
       <div class="absolute -inset-0.5 rounded-2xl bg-cyan-400/50 blur-xl opacity-0 transition group-hover:opacity-100"></div>
-      <div class="relative bg-zinc-900 rounded-2xl p-6 border border-white/5 shadow-lg shadow-black/50 
+      <div class="relative bg-[oklch(25%_0.041_260.031)] rounded-2xl p-6 border border-white/5 shadow-lg shadow-black/50 
             transition-all duration-300 hover:-translate-y-1 
             flex flex-col justify-center items-center text-center h-44">
         <h3 class="text-xl font-semibold mb-2">Forschungscampus Bindersleben</h3>
@@ -93,7 +122,7 @@
     <!-- Standort B -->
     <a href="StandortB.html" class="group relative w-64">
       <div class="absolute -inset-0.5 rounded-2xl bg-cyan-400/50 blur-xl opacity-0 transition group-hover:opacity-100"></div>
-      <div class="relative bg-zinc-900 rounded-2xl p-6 border border-white/5 shadow-lg shadow-black/50 
+      <div class="relative bg-[oklch(25%_0.041_260.031)] rounded-2xl p-6 border border-white/5 shadow-lg shadow-black/50 
             transition-all duration-300 hover:-translate-y-1 
             flex flex-col justify-center items-center text-center h-44">
         <h3 class="text-xl font-semibold mb-2">Campus Alte Post</h3>
@@ -104,33 +133,40 @@
     <!-- Standort C -->
     <a href="StandortC.html" class="group relative w-64">
       <div class="absolute -inset-0.5 rounded-2xl bg-cyan-400/50 blur-xl opacity-0 transition group-hover:opacity-100"></div>
-      <div class="relative bg-zinc-900 rounded-2xl p-6 border border-white/5 shadow-lg shadow-black/50 
+      <div class="relative bg-[oklch(25%_0.041_260.031)] rounded-2xl p-6 border border-white/5 shadow-lg shadow-black/50 
             transition-all duration-300 hover:-translate-y-1 
             flex flex-col justify-center items-center text-center h-44">
         <h3 class="text-xl font-semibold mb-2">Villa Marienhaus</h3>
         <p class="text-zinc-400 text-sm">Hauptsitz & Hochschulzentrale</p>
       </div>
     </a>
-
   </div>
-
 </main>
 
 
 
   <!-- Footer -->
-  <footer class="bg-zinc-950 border-t border-white/0 py-6 text-center">
+  <footer class="bg-[oklch(16%_0.042_265.755)] border-t border-white/0 py-6 text-center">
     <img src="images/HMU_Logo.png" alt="Logo" class="mx-auto h-10 w-auto">
     <p class="text-zinc-400 text-sm mt-2">Powered by Trainex</p>
   </footer>
 
 
-
+<!-- Js Script -->
 <script>
     document.addEventListener("DOMContentLoaded", () => {
       const body = document.body;
       const input = document.getElementById("room-search");
       const resultsBox = document.getElementById("search-results");
+
+// Hier Meldung-Container anlegen, falls noch nicht vorhanden
+  let messageBox = document.getElementById("search-message");
+  if (!messageBox) {
+    messageBox = document.createElement("div");
+    messageBox.id = "search-message";
+    messageBox.className = "mt-2 text-sm text-red-500 hidden";
+    input.parentNode.appendChild(messageBox);
+    }
 
       const rooms = [
       
@@ -187,10 +223,12 @@
       input.addEventListener("input", () => {
         const query = input.value.toLowerCase();
         resultsBox.innerHTML = "";
+        messageBox.classList.add("hidden"); // Meldung verstecken bei neuem Input
+        messageBox.style.display = "none"; // Meldung sofort verstecken bei neuem Input
 
         if (!query) {
-          resultsBox.classList.add("hidden");
-          return;
+        // Wenn Input leer ist, nichts anzeigen und Meldung verstecken
+        return;
         }
 
         const matches = rooms.filter(r =>
@@ -198,9 +236,13 @@
         );
 
         if (!matches.length) {
-          resultsBox.classList.add("hidden");
+          messageBox.textContent = "Kein Raum gefunden";
+          messageBox.style.display = "block"; // sichtbar machen
           return;
-        }
+          }
+
+        // Treffer vorhanden → Meldung verstecken
+        messageBox.style.display = "none";
 
         resultsBox.classList.remove("hidden");
 
@@ -241,6 +283,5 @@
     });
   </script>
 
-  
 </body>
 </html>
