@@ -47,6 +47,14 @@ body.preload {
 @keyframes fadeOutPage { from {opacity:1} to {opacity:0} }
 .fadeOutPage { animation: fadeOutPage 0.5s forwards; }
 </style>
+
+<!--Daten Import-->
+<style>
+.booking-line-1,
+.booking-line-2 {
+  min-height: 1.25rem;
+}
+</style>
 </head>
 
 <body class=" preload min-h-screen text-zinc-100 font-sans bg-[oklch(16%_0.042_265.755)] flex flex-col">
@@ -661,7 +669,7 @@ body.preload {
       </div>
 
       <!-- Raum 7 -->
-      <div class="group relative room-card cursor-pointer "id="P4.34">
+      <div class="group relative room-card cursor-pointer" id="P4.34">
         <div class="
           absolute -inset-0.5 rounded-2xl bg-green-400/50 blur-xl opacity-0 transition group-hover:opacity-100
         "></div>
@@ -673,14 +681,10 @@ body.preload {
             <h3 class="text-lg font-semibold">
             P4.34 <span class=" text-sm font-medium">(Anatomie)</span>
             </h3>
-            <span class="text-emerald-400 text-sm font-medium mt-1">frei</span>
+            <span class="room-status text-sm font-medium mt-1 text-zinc-400">lädt…</span>
           </div>
-          <p class="text-zinc-400 text-sm mb-4">
-            HEUTE: 29.12.25 von 07:00 bis 13:00 Uhr Herr Töpfer 
-          </p>
-          <p class="text-zinc-400 text-sm">
-            HEUTE: 29.12.25 von 07:00 bis 13:00 Uhr Herr Töpfer 
-          </p>
+          <p class="text-zinc-400 text-sm mb-4 booking-line-1"></p>
+          <p class="text-zinc-400 text-sm booking-line-2"></p>
         </div>
       </div>
 
@@ -1041,7 +1045,6 @@ body.preload {
 
 </div>
   </main>
-
 </body>
 
 
@@ -1309,7 +1312,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
-
 <!--Daten Import Scraper (Render)-->
 <script>
 async function loadRoomData() {
@@ -1347,8 +1349,7 @@ async function loadRoomData() {
 }
 
 loadRoomData();
-</script>  
+</script>
+
 </html>
-
-
 
