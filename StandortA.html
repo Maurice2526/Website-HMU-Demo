@@ -1316,7 +1316,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <script>
 async function loadRoomData() {
   try {
-    const res = await fetch("/api/rooms-proxy");
+    const res = await fetch("https://backend-hmu-website.onrender.com/api/rooms-proxy");
     const data = await res.json();
     console.log("Raumdaten:", data);
 
@@ -1352,4 +1352,5 @@ loadRoomData();
 </script>
 
 </html>
+
 
