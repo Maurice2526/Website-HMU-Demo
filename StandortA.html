@@ -1309,6 +1309,46 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
+
+<!--Daten Import Scraper (Render)-->
+<script>
+async function loadRoomData() {
+  try {
+    const res = await fetch("/api/rooms-proxy");
+    const data = await res.json();
+    console.log("Raumdaten:", data);
+
+    data.rooms.forEach(room => {
+      const card = document.getElementById(room.id);
+      if (!card) return;
+
+      const statusEl = card.querySelector(".room-status");
+      const line1 = card.querySelector(".booking-line-1");
+      const line2 = card.querySelector(".booking-line-2");
+
+      if (room.status === "frei") {
+        statusEl.textContent = "frei";
+        statusEl.className = "room-status text-emerald-400 text-sm font-medium mt-1";
+        line1.textContent = "Keine aktuelle Belegung";
+        line2.textContent = "";
+      }
+
+      if (room.status === "belegt") {
+        statusEl.textContent = "belegt";
+        statusEl.className = "room-status text-red-400 text-sm font-medium mt-1";
+        line1.textContent = room.currentBooking || "Belegt";
+        line2.textContent = "";
+      }
+    });
+
+  } catch (err) {
+    console.error("❌ Raumdaten konnten nicht geladen werden", err);
+  }
+}
+
+loadRoomData();
+</script>  
 </html>
+
 
 
