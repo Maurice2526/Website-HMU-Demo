@@ -683,7 +683,7 @@ body.preload {
             </h3>
             <span class="room-status text-sm font-medium mt-1 text-zinc-400"></span>
           </div>
-          <p class="text-zinc-400 text-sm mb-4 booking-line-1"></p>
+          <p class="text-zinc-400 text-sm mb-4 booking-line-1 mb-4"></p>
           <p class="text-zinc-400 text-sm booking-line-2"></p>
         </div>
       </div>
@@ -1314,11 +1314,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <!--Daten Import Scraper (Render)-->
 <script>
+
+/* === HILFSFUNKTION === */
+function truncate(text, maxLength = 60) {
+  if (!text) return "";
+  return text.length > maxLength
+    ? text.substring(0, maxLength) + "…"
+    : text;
+}
+
+/* === DATEN LADEN === */
 async function loadRoomData() {
   try {
     const res = await fetch("https://backend-hmu-website.onrender.com/api/rooms-proxy");
     const data = await res.json();
-    console.log("Raumdaten:", data);
 
     data.rooms.forEach(room => {
       const card = document.getElementById(room.id);
@@ -1332,14 +1341,14 @@ async function loadRoomData() {
         statusEl.textContent = "frei";
         statusEl.className = "room-status text-emerald-400 text-sm font-medium mt-1";
         line1.textContent = "Keine aktuelle Belegung";
-        line2.textContent = "";
+        line2.textContent = "—";
       }
 
       if (room.status === "belegt") {
         statusEl.textContent = "belegt";
         statusEl.className = "room-status text-red-400 text-sm font-medium mt-1";
-        line1.textContent = room.currentBooking || "Belegt";
-        line2.textContent = "";
+        line1.textContent = truncate(room.currentBooking, 60);
+        line2.textContent = truncate(room.currentBooking, 60);
       }
     });
 
@@ -1351,7 +1360,6 @@ async function loadRoomData() {
 loadRoomData();
 </script>
 
+
 </html>
-
-
 
