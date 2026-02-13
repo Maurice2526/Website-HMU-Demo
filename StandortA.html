@@ -1314,21 +1314,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-<!--Daten Import Scraper (Render)-->
+<!-- Daten Import Scraper (GitHub) -->
 <script>
+/* === KONFIG === */
+const MAX_LINES = 7;
+const MAX_CHARS = 60;
 
-/* === HILFSFUNKTION === */
-function formatFixed(text, length = 60) {
+/* === HILFSFUNKTIONEN === */
+
+// Text auf exakt 60 Zeichen bringen
+function formatFixed(text, length = MAX_CHARS) {
   if (!text) text = "";
-
-  if (text.length > length) {
-    return text.substring(0, length);
-  }
-
+  if (text.length > length) return text.substring(0, length);
   return text.padEnd(length, " ");
 }
 
-/* === DATEN LADEN === */
+// Zeitstring (13:00) in Minuten umwandeln
+function timeToMinutes(timeStr) {
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  return hours * 60 + minutes;
+}
+
+// Status berechnen: "belegt" wenn jetzt in einer Buchung
+function getRoomStatus(upcomingBookings) {
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  for (let booking of upcomingBookings) {
+    // booking: String wie "HEUTE: 13.02.26 von 13:00 bis 16:00 Uhr Herr Töpfer"
+    const match = /von (\d{2}:\d{2}) bis (\d{2}:\d{2}) Uhr/.exec(booking);
+    if (!match) continue;
+
+    const start = timeToMinutes(match[1]);
+    const end = timeToMinutes(match[2]);
+
+    if (currentMinutes >= start && currentMinutes <= end) return "belegt";
+  }
+  return "frei";
+}
+
+/* === DATEN LADEN & RENDERN === */
 async function loadRoomData() {
   try {
     const res = await fetch("https://raw.githubusercontent.com/Maurice2526/Scraper/refs/heads/main/rooms.json");
@@ -1339,21 +1364,23 @@ async function loadRoomData() {
       if (!card) return;
 
       const statusEl = card.querySelector(".room-status");
-      const line1 = card.querySelector(".booking-line-1");
-      const line2 = card.querySelector(".booking-line-2");
+      const bookingLines = card.querySelectorAll(".booking-line"); // max. 7 Zeilen
 
-      if (room.status === "frei") {
-        statusEl.textContent = "frei";
-        statusEl.className = "room-status text-emerald-400 text-sm font-medium mt-1";
-        line1.textContent = "—";
-        line2.textContent = "—";
-      }
+      // Status bestimmen
+      const status = getRoomStatus(room.upcomingBookings);
 
-      if (room.status === "belegt") {
-        statusEl.textContent = "belegt";
-        statusEl.className = "room-status text-red-400 text-sm font-medium mt-1";
-        line1.textContent = formatFixed(room.currentBooking, 60);
-        line2.textContent = formatFixed(room.currentBooking, 60);
+      // Status aktualisieren
+      statusEl.textContent = status;
+      statusEl.className = "room-status text-sm font-medium mt-1 " +
+        (status === "belegt" ? "text-red-400" : "text-emerald-400");
+
+      // Buchungen auf max. 7 Zeilen verteilen
+      for (let i = 0; i < MAX_LINES; i++) {
+        if (room.upcomingBookings[i]) {
+          bookingLines[i].textContent = formatFixed(room.upcomingBookings[i], MAX_CHARS);
+        } else {
+          bookingLines[i].textContent = formatFixed("", MAX_CHARS); // leere Zeilen, damit Card gleich groß bleibt
+        }
       }
     });
 
@@ -1362,10 +1389,11 @@ async function loadRoomData() {
   }
 }
 
-loadRoomData();
+document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
