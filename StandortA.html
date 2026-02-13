@@ -1314,117 +1314,94 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-<!-- Daten Import Scraper (GitHub) -->
+<!--Daten Import Scraper (Render)-->
 <script>
-// ==============================
-// KONFIG
-// ==============================
-const MAX_LINES = 7;
-const MAX_CHARS = 60;
-const ROOM_JSON_URL = "https://raw.githubusercontent.com/Maurice2526/Scraper/refs/heads/main/rooms.json"; 
+/* === HILFSFUNKTION === */
+// Text in max 2 Zeilen umbrechen, Wörter nicht trennen, max 39 Zeichen pro Zeile
+function formatTwoLines(text, lineLength = 39) {
+  if (!text) return "";
 
-// ==============================
-// HELPER
-// ==============================
+  const words = text.split(" ");
+  let line1 = "";
+  let line2 = "";
+  let currentLine = "";
 
-// Text auf exakt 60 Zeichen bringen
-function formatTo60Chars(text) {
-  if (!text) return "&nbsp;".repeat(MAX_CHARS);
-  if (text.length > MAX_CHARS) return text.substring(0, MAX_CHARS);
-  return text.padEnd(MAX_CHARS, " ");
-}
-
-// Zeitstring (13:00) in Minuten umwandeln
-function timeToMinutes(timeStr) {
-  const [hours, minutes] = timeStr.split(":").map(Number);
-  return hours * 60 + minutes;
-}
-
-// Buchungen nach Startzeit sortieren
-function sortBookings(bookings) {
-  return bookings.sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
-}
-
-// Status berechnen: "belegt" wenn jetzt in einer Buchung
-function getRoomStatus(bookings) {
-  const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-  for (let booking of bookings) {
-    const start = timeToMinutes(booking.start);
-    const end = timeToMinutes(booking.end);
-    if (currentMinutes >= start && currentMinutes <= end) return "belegt";
-  }
-
-  return "frei";
-}
-
-// Parsing von Buchungs-Strings
-function parseBookingString(str) {
-  const regex = /HEUTE:\s*(\d{2}\.\d{2}\.\d{2})\s*von\s*(\d{2}:\d{2})\s*bis\s*(\d{2}:\d{2})\s*Uhr\s*(.*)/;
-  const match = regex.exec(str);
-  if (!match) return null;
-  return { date: match[1], start: match[2], end: match[3], person: match[4] };
-}
-
-// ==============================
-// RENDER FUNKTION
-// ==============================
-function renderRoom(roomId, bookings) {
-  const card = document.getElementById(roomId);
-  if (!card) return;
-
-  const bookingLines = card.querySelectorAll(".booking-line");
-  const statusElement = card.querySelector(".room-status");
-
-  // Sortieren
-  const sortedBookings = sortBookings(bookings);
-
-  // Status setzen
-  const status = getRoomStatus(sortedBookings);
-  if (statusElement) {
-    statusElement.textContent = status;
-    statusElement.classList.remove("text-emerald-400", "text-red-400");
-    statusElement.classList.add(status === "belegt" ? "text-red-400" : "text-emerald-400");
-  }
-
-  // Buchungen füllen, max 7 Zeilen
-  for (let i = 0; i < MAX_LINES; i++) {
-    if (sortedBookings[i]) {
-      const booking = sortedBookings[i];
-      const text = `HEUTE: ${booking.date} von ${booking.start} bis ${booking.end} Uhr ${booking.person}`;
-      bookingLines[i].innerHTML = formatTo60Chars(text).replace(/ /g, "&nbsp;");
+  for (let word of words) {
+    if ((currentLine + (currentLine ? " " : "") + word).length <= lineLength) {
+      currentLine += (currentLine ? " " : "") + word;
     } else {
-      bookingLines[i].innerHTML = "&nbsp;".repeat(MAX_CHARS);
+      if (!line1) {
+        line1 = currentLine;
+        currentLine = word;
+      } else {
+        line2 = currentLine;
+        currentLine = word;
+      }
     }
   }
+
+  if (!line1) line1 = currentLine;
+  else if (!line2) line2 = currentLine;
+
+  return line1 + "\n" + line2;
 }
 
-// ==============================
-// DATEN LADEN
-// ==============================
+// Extrahiert nur die echten Termine bis zum "Service powered by..."
+function cleanBookings(text) {
+  if (!text) return [];
+  const cleaned = text.split("Service powered by")[0];
+  return cleaned
+    .split(/\n{2,}/)
+    .map(s => s.trim())
+    .filter(s => s)
+    .slice(0, 7);
+}
+
+/* === DATEN LADEN === */
 async function loadRoomData() {
   try {
-    const res = await fetch(ROOM_JSON_URL);
+    const res = await fetch("https://raw.githubusercontent.com/Maurice2526/Scraper/refs/heads/main/rooms.json");
     const data = await res.json();
 
     data.rooms.forEach(room => {
-      // Strings in Objekte parsen
-      const bookings = (room.upcomingBookings || []).map(parseBookingString).filter(Boolean);
-      renderRoom(room.id, bookings);
+      const card = document.getElementById(room.id);
+      if (!card) return;
+
+      const statusEl = card.querySelector(".room-status");
+      const line1El = card.querySelector(".booking-line-1");
+      const line2El = card.querySelector(".booking-line-2");
+
+      if (room.status === "frei") {
+        statusEl.textContent = "frei";
+        statusEl.className = "room-status text-emerald-400 text-sm font-medium mt-1";
+        line1El.textContent = "—";
+        line2El.textContent = "—";
+      }
+
+      if (room.status === "belegt") {
+        statusEl.textContent = "belegt";
+        statusEl.className = "room-status text-red-400 text-sm font-medium mt-1";
+
+        const rawText = typeof room.currentBooking === "string" ? room.currentBooking : "";
+        const bookings = cleanBookings(rawText);
+
+        // Booking-Line 1 = erste Buchung
+        line1El.textContent = bookings[0] ? formatTwoLines(bookings[0]) : "—";
+
+        // Booking-Line 2 = zweite Buchung
+        line2El.textContent = bookings[1] ? formatTwoLines(bookings[1]) : "—";
+      }
     });
   } catch (err) {
     console.error("❌ Raumdaten konnten nicht geladen werden", err);
   }
 }
 
-// DOM geladen → Daten laden
-document.addEventListener("DOMContentLoaded", loadRoomData);
-
+loadRoomData();
 </script>
 
-
 </html>
+
 
 
 
