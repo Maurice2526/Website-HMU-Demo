@@ -1314,14 +1314,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-<!--Daten Import Scraper (Render)-->
+<!-- Daten Import Scraper (GitHub) -->
 <script>
 // ==============================
 // KONFIG
 // ==============================
-
 const MAX_LINES = 7;
 const MAX_CHARS = 60;
+const ROOM_JSON_URL = "https://raw.githubusercontent.com/Maurice2526/Scraper/refs/heads/main/rooms.json"; 
 
 // ==============================
 // HELPER
@@ -1329,9 +1329,8 @@ const MAX_CHARS = 60;
 
 // Text auf exakt 60 Zeichen bringen
 function formatTo60Chars(text) {
-  if (text.length > MAX_CHARS) {
-    return text.substring(0, MAX_CHARS);
-  }
+  if (!text) return "&nbsp;".repeat(MAX_CHARS);
+  if (text.length > MAX_CHARS) return text.substring(0, MAX_CHARS);
   return text.padEnd(MAX_CHARS, " ");
 }
 
@@ -1343,15 +1342,10 @@ function timeToMinutes(timeStr) {
 
 // Buchungen nach Startzeit sortieren
 function sortBookings(bookings) {
-  return bookings.sort((a, b) => {
-    return timeToMinutes(a.start) - timeToMinutes(b.start);
-  });
+  return bookings.sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
 }
 
-// ==============================
-// STATUS BERECHNEN (frei / belegt)
-// ==============================
-
+// Status berechnen: "belegt" wenn jetzt in einer Buchung
 function getRoomStatus(bookings) {
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -1359,19 +1353,23 @@ function getRoomStatus(bookings) {
   for (let booking of bookings) {
     const start = timeToMinutes(booking.start);
     const end = timeToMinutes(booking.end);
-
-    if (currentMinutes >= start && currentMinutes <= end) {
-      return "belegt";
-    }
+    if (currentMinutes >= start && currentMinutes <= end) return "belegt";
   }
 
   return "frei";
 }
 
+// Parsing von Buchungs-Strings
+function parseBookingString(str) {
+  const regex = /HEUTE:\s*(\d{2}\.\d{2}\.\d{2})\s*von\s*(\d{2}:\d{2})\s*bis\s*(\d{2}:\d{2})\s*Uhr\s*(.*)/;
+  const match = regex.exec(str);
+  if (!match) return null;
+  return { date: match[1], start: match[2], end: match[3], person: match[4] };
+}
+
 // ==============================
 // RENDER FUNKTION
 // ==============================
-
 function renderRoom(roomId, bookings) {
   const card = document.getElementById(roomId);
   if (!card) return;
@@ -1384,43 +1382,50 @@ function renderRoom(roomId, bookings) {
 
   // Status setzen
   const status = getRoomStatus(sortedBookings);
-
   if (statusElement) {
     statusElement.textContent = status;
-
-    if (status === "belegt") {
-      statusElement.classList.remove("text-emerald-400");
-      statusElement.classList.add("text-red-400");
-    } else {
-      statusElement.classList.remove("text-red-400");
-      statusElement.classList.add("text-emerald-400");
-    }
+    statusElement.classList.remove("text-emerald-400", "text-red-400");
+    statusElement.classList.add(status === "belegt" ? "text-red-400" : "text-emerald-400");
   }
 
-  // Max 7 Zeilen füllen
+  // Buchungen füllen, max 7 Zeilen
   for (let i = 0; i < MAX_LINES; i++) {
     if (sortedBookings[i]) {
       const booking = sortedBookings[i];
-
       const text = `HEUTE: ${booking.date} von ${booking.start} bis ${booking.end} Uhr ${booking.person}`;
-      const formatted = formatTo60Chars(text);
-
-      bookingLines[i].innerHTML = formatted.replace(/ /g, "&nbsp;");
+      bookingLines[i].innerHTML = formatTo60Chars(text).replace(/ /g, "&nbsp;");
     } else {
       bookingLines[i].innerHTML = "&nbsp;".repeat(MAX_CHARS);
     }
   }
 }
-  
-document.addEventListener("DOMContentLoaded", () => {
-  roomData.forEach(room => {
-    renderRoom(room.id, room.bookings);
-  });
-});
+
+// ==============================
+// DATEN LADEN
+// ==============================
+async function loadRoomData() {
+  try {
+    const res = await fetch(ROOM_JSON_URL);
+    const data = await res.json();
+
+    data.rooms.forEach(room => {
+      // Strings in Objekte parsen
+      const bookings = (room.upcomingBookings || []).map(parseBookingString).filter(Boolean);
+      renderRoom(room.id, bookings);
+    });
+  } catch (err) {
+    console.error("❌ Raumdaten konnten nicht geladen werden", err);
+  }
+}
+
+// DOM geladen → Daten laden
+document.addEventListener("DOMContentLoaded", loadRoomData);
 
 </script>
 
+
 </html>
+
 
 
 
