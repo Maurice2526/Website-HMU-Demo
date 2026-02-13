@@ -1316,92 +1316,113 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <!--Daten Import Scraper (Render)-->
 <script>
-/* === HILFSFUNKTION === */
-// Text in max 2 Zeilen umbrechen, Wörter nicht trennen, max 39 Zeichen pro Zeile
-function formatTwoLines(text, lineLength = 60) {
-  if (!text) return "";
+// ==============================
+// KONFIG
+// ==============================
 
-  const words = text.split(" ");
-  let line1 = "";
-  let line2 = "";
-  let currentLine = "";
+const MAX_LINES = 7;
+const MAX_CHARS = 60;
 
-  for (let word of words) {
-    if ((currentLine + (currentLine ? " " : "") + word).length <= lineLength) {
-      currentLine += (currentLine ? " " : "") + word;
-    } else {
-      if (!line1) {
-        line1 = currentLine;
-        currentLine = word;
-      } else {
-        line2 = currentLine;
-        currentLine = word;
-      }
+// ==============================
+// HELPER
+// ==============================
+
+// Text auf exakt 60 Zeichen bringen
+function formatTo60Chars(text) {
+  if (text.length > MAX_CHARS) {
+    return text.substring(0, MAX_CHARS);
+  }
+  return text.padEnd(MAX_CHARS, " ");
+}
+
+// Zeitstring (13:00) in Minuten umwandeln
+function timeToMinutes(timeStr) {
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  return hours * 60 + minutes;
+}
+
+// Buchungen nach Startzeit sortieren
+function sortBookings(bookings) {
+  return bookings.sort((a, b) => {
+    return timeToMinutes(a.start) - timeToMinutes(b.start);
+  });
+}
+
+// ==============================
+// STATUS BERECHNEN (frei / belegt)
+// ==============================
+
+function getRoomStatus(bookings) {
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  for (let booking of bookings) {
+    const start = timeToMinutes(booking.start);
+    const end = timeToMinutes(booking.end);
+
+    if (currentMinutes >= start && currentMinutes <= end) {
+      return "belegt";
     }
   }
 
-  if (!line1) line1 = currentLine;
-  else if (!line2) line2 = currentLine;
-
-  return line1 + "\n" + line2;
+  return "frei";
 }
 
-// Extrahiert nur die echten Termine bis zum "Service powered by..."
-function cleanBookings(text) {
-  if (!text) return [];
-  const cleaned = text.split("Service powered by")[0];
-  return cleaned
-    .split(/\n{2,}/)
-    .map(s => s.trim())
-    .filter(s => s)
-    .slice(0, 7);
-}
+// ==============================
+// RENDER FUNKTION
+// ==============================
 
-/* === DATEN LADEN === */
-async function loadRoomData() {
-  try {
-    const res = await fetch("https://raw.githubusercontent.com/Maurice2526/Scraper/refs/heads/main/rooms.json");
-    const data = await res.json();
+function renderRoom(roomId, bookings) {
+  const card = document.getElementById(roomId);
+  if (!card) return;
 
-    data.rooms.forEach(room => {
-      const card = document.getElementById(room.id);
-      if (!card) return;
+  const bookingLines = card.querySelectorAll(".booking-line");
+  const statusElement = card.querySelector(".room-status");
 
-      const statusEl = card.querySelector(".room-status");
-      const line1El = card.querySelector(".booking-line-1");
-      const line2El = card.querySelector(".booking-line-2");
+  // Sortieren
+  const sortedBookings = sortBookings(bookings);
 
-      if (room.status === "frei") {
-        statusEl.textContent = "frei";
-        statusEl.className = "room-status text-emerald-400 text-sm font-medium mt-1";
-        line1El.textContent = "—";
-        line2El.textContent = "—";
-      }
+  // Status setzen
+  const status = getRoomStatus(sortedBookings);
 
-      if (room.status === "belegt") {
-        statusEl.textContent = "belegt";
-        statusEl.className = "room-status text-red-400 text-sm font-medium mt-1";
+  if (statusElement) {
+    statusElement.textContent = status;
 
-        const rawText = typeof room.currentBooking === "string" ? room.currentBooking : "";
-        const bookings = cleanBookings(rawText);
+    if (status === "belegt") {
+      statusElement.classList.remove("text-emerald-400");
+      statusElement.classList.add("text-red-400");
+    } else {
+      statusElement.classList.remove("text-red-400");
+      statusElement.classList.add("text-emerald-400");
+    }
+  }
 
-        // Booking-Line 1 = erste Buchung
-        line1El.textContent = bookings[0] ? formatTwoLines(bookings[0]) : "—";
+  // Max 7 Zeilen füllen
+  for (let i = 0; i < MAX_LINES; i++) {
+    if (sortedBookings[i]) {
+      const booking = sortedBookings[i];
 
-        // Booking-Line 2 = zweite Buchung
-        line2El.textContent = bookings[1] ? formatTwoLines(bookings[1]) : "—";
-      }
-    });
-  } catch (err) {
-    console.error("❌ Raumdaten konnten nicht geladen werden", err);
+      const text = `HEUTE: ${booking.date} von ${booking.start} bis ${booking.end} Uhr ${booking.person}`;
+      const formatted = formatTo60Chars(text);
+
+      bookingLines[i].innerHTML = formatted.replace(/ /g, "&nbsp;");
+    } else {
+      bookingLines[i].innerHTML = "&nbsp;".repeat(MAX_CHARS);
+    }
   }
 }
 
-loadRoomData();
+document.addEventListener("DOMContentLoaded", () => {
+  roomData.forEach(room => {
+    renderRoom(room.id, room.bookings);
+  });
+});
+
 </script>
 
 
 </html>
+
 
 
 
