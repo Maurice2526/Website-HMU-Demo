@@ -1316,16 +1316,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <!--Daten Import Scraper (Render)-->
 <script>
-
 /* === HILFSFUNKTION === */
-function formatFixed(text, length = 60) {
-  if (!text) text = "";
+// Text in max 2 Zeilen umbrechen, Wörter nicht trennen, max 39 Zeichen pro Zeile
+function formatTwoLines(text, lineLength = 39) {
+  if (!text) return "";
 
-  if (text.length > length) {
-    return text.substring(0, length);
+  const words = text.split(" ");
+  let line1 = "";
+  let line2 = "";
+  let currentLine = "";
+
+  for (let word of words) {
+    if ((currentLine + (currentLine ? " " : "") + word).length <= lineLength) {
+      currentLine += (currentLine ? " " : "") + word;
+    } else {
+      if (!line1) {
+        line1 = currentLine;
+        currentLine = word;
+      } else {
+        line2 = currentLine;
+        currentLine = word;
+      }
+    }
   }
 
-  return text.padEnd(length, " ");
+  if (!line1) line1 = currentLine;
+  else if (!line2) line2 = currentLine;
+
+  return line1 + "\n" + line2;
+}
+
+// Extrahiert nur die echten Termine bis zum "Service powered by..."
+function cleanBookings(text) {
+  if (!text) return [];
+  const cleaned = text.split("Service powered by")[0];
+  return cleaned
+    .split(/\n{2,}/)
+    .map(s => s.trim())
+    .filter(s => s)
+    .slice(0, 7);
 }
 
 /* === DATEN LADEN === */
@@ -1339,24 +1368,30 @@ async function loadRoomData() {
       if (!card) return;
 
       const statusEl = card.querySelector(".room-status");
-      const line1 = card.querySelector(".booking-line-1");
-      const line2 = card.querySelector(".booking-line-2");
+      const line1El = card.querySelector(".booking-line-1");
+      const line2El = card.querySelector(".booking-line-2");
 
       if (room.status === "frei") {
         statusEl.textContent = "frei";
         statusEl.className = "room-status text-emerald-400 text-sm font-medium mt-1";
-        line1.textContent = "—";
-        line2.textContent = "—";
+        line1El.textContent = "—";
+        line2El.textContent = "—";
       }
 
       if (room.status === "belegt") {
         statusEl.textContent = "belegt";
         statusEl.className = "room-status text-red-400 text-sm font-medium mt-1";
-        line1.textContent = formatFixed(room.currentBooking, 60);
-        line2.textContent = formatFixed(room.currentBooking, 60);
+
+        const rawText = typeof room.currentBooking === "string" ? room.currentBooking : "";
+        const bookings = cleanBookings(rawText);
+
+        // Booking-Line 1 = erste Buchung
+        line1El.textContent = bookings[0] ? formatTwoLines(bookings[0]) : "—";
+
+        // Booking-Line 2 = zweite Buchung
+        line2El.textContent = bookings[1] ? formatTwoLines(bookings[1]) : "—";
       }
     });
-
   } catch (err) {
     console.error("❌ Raumdaten konnten nicht geladen werden", err);
   }
@@ -1367,5 +1402,6 @@ loadRoomData();
 
 
 </html>
+
 
 
