@@ -1318,7 +1318,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <script>
 /* === HILFSFUNKTION === */
 // Text in max 2 Zeilen umbrechen, Wörter nicht trennen, max 39 Zeichen pro Zeile
-function formatTwoLines(text, lineLength = 39) {
+function formatTwoLines(text, lineLength = 60) {
   if (!text) return "";
 
   const words = text.split(" ");
@@ -1402,6 +1402,7 @@ loadRoomData();
 
 
 </html>
+
 
 
 
