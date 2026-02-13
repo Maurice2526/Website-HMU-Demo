@@ -1331,7 +1331,7 @@ function formatFixed(text, length = 60) {
 /* === DATEN LADEN === */
 async function loadRoomData() {
   try {
-    const res = await fetch("https://backend-hmu-website.onrender.com/api/rooms-proxy");
+    const res = await fetch("https://raw.githubusercontent.com/Maurice2526/Scraper/refs/heads/main/rooms.json");
     const data = await res.json();
 
     data.rooms.forEach(room => {
@@ -1367,4 +1367,5 @@ loadRoomData();
 
 
 </html>
+
 
