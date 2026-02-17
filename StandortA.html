@@ -683,9 +683,14 @@ body.preload {
             </h3>
             <span class="room-status text-sm font-medium mt-1 text-zinc-400"></span>
           </div>
-          <p class="booking-line-1 whitespace-pre text-sm text-zinc-400 leading-none m-0 p-0"></p>
-          <p class="booking-line-2 whitespace-pre text-sm text-zinc-400 leading-none m-0 p-0"></p>
-        </div>
+            <p class="booking-line text-zinc-400 text-sm"></p>
+            <p class="booking-line text-zinc-400 text-sm"></p>
+            <p class="booking-line text-zinc-400 text-sm"></p>
+            <p class="booking-line text-zinc-400 text-sm"></p>
+            <p class="booking-line text-zinc-400 text-sm"></p>
+            <p class="booking-line text-zinc-400 text-sm"></p>
+            <p class="booking-line text-zinc-400 text-sm"></p>
+          </div>
       </div>
 
       <!-- Raum 8 -->
@@ -1316,76 +1321,130 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <!-- Daten Import Scraper (GitHub) -->
 <script>
-/* === KONFIG === */
+// =====================================
+// KONFIG
+// =====================================
+
 const MAX_LINES = 7;
 const MAX_CHARS = 60;
+const DATA_URL = "https://raw.githubusercontent.com/Maurice2526/Scraper/main/rooms.json";
 
-/* === HILFSFUNKTIONEN === */
+// =====================================
+// HILFSFUNKTIONEN
+// =====================================
 
-// Text auf exakt 60 Zeichen bringen
-function formatFixed(text, length = MAX_CHARS) {
-  if (!text) text = "";
-  if (text.length > length) return text.substring(0, length);
-  return text.padEnd(length, " ");
+// 60 Zeichen fixieren
+function formatFixed(text) {
+  if (text.length > MAX_CHARS) {
+    return text.substring(0, MAX_CHARS);
+  }
+  return text.padEnd(MAX_CHARS, " ");
 }
 
-// Zeitstring (13:00) in Minuten umwandeln
+// Datum in deutsches Kurzformat 13.02.26
+function formatGermanDate(dateStr) {
+  const d = new Date(dateStr);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = String(d.getFullYear()).slice(-2);
+  return `${day}.${month}.${year}`;
+}
+
+// Minutenvergleich
 function timeToMinutes(timeStr) {
-  const [hours, minutes] = timeStr.split(":").map(Number);
-  return hours * 60 + minutes;
+  const [h, m] = timeStr.split(":").map(Number);
+  return h * 60 + m;
 }
 
-// Status berechnen: "belegt" wenn jetzt in einer Buchung
-function getRoomStatus(upcomingBookings) {
+// Prüfen ob Buchung heute ist
+function isToday(dateStr) {
+  const today = new Date();
+  const bookingDate = new Date(dateStr);
+
+  return (
+    today.getFullYear() === bookingDate.getFullYear() &&
+    today.getMonth() === bookingDate.getMonth() &&
+    today.getDate() === bookingDate.getDate()
+  );
+}
+
+// Status berechnen
+function getRoomStatus(bookings) {
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  for (let booking of upcomingBookings) {
-    // booking: String wie "HEUTE: 13.02.26 von 13:00 bis 16:00 Uhr Herr Töpfer"
-    const match = /von (\d{2}:\d{2}) bis (\d{2}:\d{2}) Uhr/.exec(booking);
-    if (!match) continue;
+  for (let booking of bookings) {
+    if (!isToday(booking.date)) continue;
 
-    const start = timeToMinutes(match[1]);
-    const end = timeToMinutes(match[2]);
+    const start = timeToMinutes(booking.start);
+    const end = timeToMinutes(booking.end);
 
-    if (currentMinutes >= start && currentMinutes <= end) return "belegt";
+    if (currentMinutes >= start && currentMinutes <= end) {
+      return "belegt";
+    }
   }
+
   return "frei";
 }
 
-/* === DATEN LADEN & RENDERN === */
+// =====================================
+// RENDER LOGIK
+// =====================================
+
+function renderRoom(room) {
+  const card = document.getElementById(room.id);
+  if (!card) return;
+
+  const statusEl = card.querySelector(".room-status");
+  const lines = card.querySelectorAll(".booking-line");
+
+  // Nur heutige Buchungen
+  const todaysBookings = room.bookings
+    .filter(b => isToday(b.date))
+    .sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
+
+  // STATUS SETZEN
+  const status = getRoomStatus(todaysBookings);
+
+  statusEl.textContent = status;
+
+  if (status === "belegt") {
+    statusEl.classList.remove("text-emerald-400");
+    statusEl.classList.add("text-red-400");
+  } else {
+    statusEl.classList.remove("text-red-400");
+    statusEl.classList.add("text-emerald-400");
+  }
+
+  // ZEILEN FÜLLEN
+  for (let i = 0; i < MAX_LINES; i++) {
+    if (todaysBookings[i]) {
+      const booking = todaysBookings[i];
+
+      const text = `HEUTE: ${formatGermanDate(booking.date)} von ${booking.start} bis ${booking.end} Uhr ${booking.person}`;
+
+      lines[i].innerHTML = formatFixed(text).replace(/ /g, "&nbsp;");
+    } else {
+      lines[i].innerHTML = "&nbsp;".repeat(MAX_CHARS);
+    }
+  }
+}
+
+// =====================================
+// DATEN LADEN
+// =====================================
+
 async function loadRoomData() {
   try {
-    const res = await fetch("https://raw.githubusercontent.com/Maurice2526/Scraper/refs/heads/main/rooms.json");
+    const res = await fetch(DATA_URL);
     const data = await res.json();
 
     data.rooms.forEach(room => {
-      const card = document.getElementById(room.id);
-      if (!card) return;
-
-      const statusEl = card.querySelector(".room-status");
-      const bookingLines = card.querySelectorAll(".booking-line"); // max. 7 Zeilen
-
-      // Status bestimmen
-      const status = getRoomStatus(room.upcomingBookings);
-
-      // Status aktualisieren
-      statusEl.textContent = status;
-      statusEl.className = "room-status text-sm font-medium mt-1 " +
-        (status === "belegt" ? "text-red-400" : "text-emerald-400");
-
-      // Buchungen auf max. 7 Zeilen verteilen
-      for (let i = 0; i < MAX_LINES; i++) {
-        if (room.upcomingBookings[i]) {
-          bookingLines[i].textContent = formatFixed(room.upcomingBookings[i], MAX_CHARS);
-        } else {
-          bookingLines[i].textContent = formatFixed("", MAX_CHARS); // leere Zeilen, damit Card gleich groß bleibt
-        }
-      }
+      renderRoom(room);
     });
 
   } catch (err) {
-    console.error("❌ Raumdaten konnten nicht geladen werden", err);
+    console.error("❌ Fehler beim Laden der Raumdaten", err);
   }
 }
 
@@ -1393,6 +1452,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
