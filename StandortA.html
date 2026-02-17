@@ -683,14 +683,14 @@ body.preload {
             </h3>
             <span class="room-status text-sm font-medium mt-1 text-zinc-400"></span>
           </div>
-            <p class="booking-line text-zinc-400 text-sm"></p>
-            <p class="booking-line text-zinc-400 text-sm"></p>
-            <p class="booking-line text-zinc-400 text-sm"></p>
-            <p class="booking-line text-zinc-400 text-sm"></p>
-            <p class="booking-line text-zinc-400 text-sm"></p>
-            <p class="booking-line text-zinc-400 text-sm"></p>
-            <p class="booking-line text-zinc-400 text-sm"></p>
-          </div>
+            <p class="booking-line text-zinc-400 text-sm font-mono whitespace-nowrap overflow-hidden"></p>
+            <p class="booking-line text-zinc-400 text-sm font-mono whitespace-nowrap overflow-hidden"></p>
+            <p class="booking-line text-zinc-400 text-sm font-mono whitespace-nowrap overflow-hidden"></p>
+            <p class="booking-line text-zinc-400 text-sm font-mono whitespace-nowrap overflow-hidden"></p>
+            <p class="booking-line text-zinc-400 text-sm font-mono whitespace-nowrap overflow-hidden"></p>
+            <p class="booking-line text-zinc-400 text-sm font-mono whitespace-nowrap overflow-hidden"></p>
+            <p class="booking-line text-zinc-400 text-sm font-mono whitespace-nowrap overflow-hidden"></p>
+        </div>
       </div>
 
       <!-- Raum 8 -->
@@ -1321,27 +1321,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <!-- Daten Import Scraper (GitHub) -->
 <script>
-// =====================================
+
+// ==========================
 // KONFIG
-// =====================================
+// ==========================
 
-const MAX_LINES = 7;
-const MAX_CHARS = 60;
 const DATA_URL = "https://raw.githubusercontent.com/Maurice2526/Scraper/main/rooms.json";
+const VIEW_MODE = "location"; // "location" = 2 Zeilen | "detail" = 7 Zeilen
 
-// =====================================
-// HILFSFUNKTIONEN
-// =====================================
+const MAX_CHARS = 60;
+const MAX_LINES = VIEW_MODE === "location" ? 2 : 7;
+const MIN_LINES = 2;
 
-// 60 Zeichen fixieren
+// ==========================
+// HELPER
+// ==========================
+
 function formatFixed(text) {
+  if (!text || text.trim() === "") text = "-";
+
   if (text.length > MAX_CHARS) {
     return text.substring(0, MAX_CHARS);
   }
+
   return text.padEnd(MAX_CHARS, " ");
 }
 
-// Datum in deutsches Kurzformat 13.02.26
 function formatGermanDate(dateStr) {
   const d = new Date(dateStr);
   const day = String(d.getDate()).padStart(2, "0");
@@ -1350,36 +1355,43 @@ function formatGermanDate(dateStr) {
   return `${day}.${month}.${year}`;
 }
 
-// Minutenvergleich
-function timeToMinutes(timeStr) {
-  const [h, m] = timeStr.split(":").map(Number);
+function timeToMinutes(t) {
+  const [h, m] = t.split(":").map(Number);
   return h * 60 + m;
 }
 
-// Prüfen ob Buchung heute ist
-function isToday(dateStr) {
-  const today = new Date();
-  const bookingDate = new Date(dateStr);
+// Prüft ob Buchung in Vergangenheit liegt
+function isFutureOrCurrent(booking) {
+  const now = new Date();
 
-  return (
-    today.getFullYear() === bookingDate.getFullYear() &&
-    today.getMonth() === bookingDate.getMonth() &&
-    today.getDate() === bookingDate.getDate()
-  );
+  const bookingDate = new Date(booking.date);
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  // Zukunftstag
+  if (bookingDate > today) return true;
+
+  // Heute → Zeit prüfen
+  if (bookingDate.getTime() === today.getTime()) {
+    const currentMin = now.getHours() * 60 + now.getMinutes();
+    return timeToMinutes(booking.end) >= currentMin;
+  }
+
+  return false;
 }
 
 // Status berechnen
-function getRoomStatus(bookings) {
+function getStatus(bookings) {
   const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const currentMin = now.getHours() * 60 + now.getMinutes();
+  const today = now.toISOString().split("T")[0];
 
-  for (let booking of bookings) {
-    if (!isToday(booking.date)) continue;
+  for (let b of bookings) {
+    if (b.date !== today) continue;
 
-    const start = timeToMinutes(booking.start);
-    const end = timeToMinutes(booking.end);
-
-    if (currentMinutes >= start && currentMinutes <= end) {
+    if (
+      currentMin >= timeToMinutes(b.start) &&
+      currentMin <= timeToMinutes(b.end)
+    ) {
       return "belegt";
     }
   }
@@ -1387,9 +1399,9 @@ function getRoomStatus(bookings) {
   return "frei";
 }
 
-// =====================================
-// RENDER LOGIK
-// =====================================
+// ==========================
+// RENDER
+// ==========================
 
 function renderRoom(room) {
   const card = document.getElementById(room.id);
@@ -1398,60 +1410,67 @@ function renderRoom(room) {
   const statusEl = card.querySelector(".room-status");
   const lines = card.querySelectorAll(".booking-line");
 
-  // Nur heutige Buchungen
-  const todaysBookings = room.bookings
-    .filter(b => isToday(b.date))
-    .sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
+  // 1️⃣ Nur aktuelle + zukünftige
+  let relevantBookings = room.bookings
+    .filter(isFutureOrCurrent)
+    .sort((a, b) => {
+      if (a.date === b.date) {
+        return timeToMinutes(a.start) - timeToMinutes(b.start);
+      }
+      return new Date(a.date) - new Date(b.date);
+    });
 
-  // STATUS SETZEN
-  const status = getRoomStatus(todaysBookings);
-
+  // 2️⃣ Status
+  const status = getStatus(relevantBookings);
   statusEl.textContent = status;
 
-  if (status === "belegt") {
-    statusEl.classList.remove("text-emerald-400");
-    statusEl.classList.add("text-red-400");
-  } else {
-    statusEl.classList.remove("text-red-400");
-    statusEl.classList.add("text-emerald-400");
-  }
+  statusEl.classList.toggle("text-red-400", status === "belegt");
+  statusEl.classList.toggle("text-emerald-400", status === "frei");
 
-  // ZEILEN FÜLLEN
-  for (let i = 0; i < MAX_LINES; i++) {
-    if (todaysBookings[i]) {
-      const booking = todaysBookings[i];
+  // 3️⃣ Anzeigen begrenzen
+  relevantBookings = relevantBookings.slice(0, MAX_LINES);
 
-      const text = `HEUTE: ${formatGermanDate(booking.date)} von ${booking.start} bis ${booking.end} Uhr ${booking.person}`;
+  // 4️⃣ Rendern
+  for (let i = 0; i < Math.max(MIN_LINES, MAX_LINES); i++) {
 
-      lines[i].innerHTML = formatFixed(text).replace(/ /g, "&nbsp;");
+    if (relevantBookings[i]) {
+
+      const b = relevantBookings[i];
+
+      const text =
+        `HEUTE: ${formatGermanDate(b.date)} von ${b.start} bis ${b.end} Uhr ${b.person}`;
+
+      lines[i].textContent = formatFixed(text);
+
     } else {
-      lines[i].innerHTML = "&nbsp;".repeat(MAX_CHARS);
+
+      lines[i].textContent = formatFixed("-");
     }
   }
 }
 
-// =====================================
-// DATEN LADEN
-// =====================================
+// ==========================
+// LOAD
+// ==========================
 
 async function loadRoomData() {
   try {
     const res = await fetch(DATA_URL);
     const data = await res.json();
 
-    data.rooms.forEach(room => {
-      renderRoom(room);
-    });
+    data.rooms.forEach(renderRoom);
 
   } catch (err) {
-    console.error("❌ Fehler beim Laden der Raumdaten", err);
+    console.error("Fehler beim Laden:", err);
   }
 }
 
 document.addEventListener("DOMContentLoaded", loadRoomData);
+
 </script>
   
 </html>
+
 
 
 
