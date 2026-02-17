@@ -1390,20 +1390,20 @@ function renderRoom(room, mode = "location") {
   // Zeile 1: Datum + Uhrzeit
   const line1Text = b.date ? `HEUTE: ${formatGermanDate(b.date)} von ${b.start} bis ${b.end} Uhr` : "-";
   const line1 = document.createElement("p");
-  line1.className = "text-zinc-400 text-sm font-mono mb-4";
+  line1.className = "text-zinc-400 text-sm mb-0";
   line1.textContent = padText(line1Text);
   bookingContainer.appendChild(line1);
 
   if (b.person) {
     // Zeile 2: Person (falls vorhanden)
     const line2 = document.createElement("p");
-    line2.className = "text-zinc-400 text-sm font-mono mb-4"; // Abstand zwischen Buchungen
+    line2.className = "text-zinc-400 text-sm mb-2"; // Abstand zwischen Buchungen
     line2.textContent = padText(b.person);
     bookingContainer.appendChild(line2);
   } else {
     // Wenn keine Person, keine zweite Zeile
     const spacer = document.createElement("p");
-    spacer.className = "mb-4"; 
+    spacer.className = "mb-2"; 
     spacer.innerHTML = "&nbsp;"; // nur für Card-Höhe
     bookingContainer.appendChild(spacer);
   }
@@ -1426,6 +1426,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 
   
 </html>
+
 
 
 
