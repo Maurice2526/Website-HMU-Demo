@@ -1316,30 +1316,11 @@ document.addEventListener("DOMContentLoaded", () => {
 <!-- Daten Import Scraper (GitHub) -->
 <script>
 const DATA_URL = "https://raw.githubusercontent.com/Maurice2526/Scraper/main/rooms.json";
-const VIEW_MODE = "location"; // "location" = 2 Buchungen, "detail" = bis 7 Buchungen
-
 const MAX_CHARS = 60;
-const MAX_LINES = VIEW_MODE === "location" ? 2 : 7;
+const MAX_BOOKINGS_LOCATION = 2;
+const MAX_BOOKINGS_DETAIL = 7;
 
 // === HELPER ===
-function wrapText(text, lineLength = MAX_CHARS) {
-  if (!text) return ["-"];
-  const words = text.split(" ");
-  const lines = [];
-  let currentLine = "";
-
-  for (let word of words) {
-    if ((currentLine + (currentLine ? " " : "") + word).length <= lineLength) {
-      currentLine += (currentLine ? " " : "") + word;
-    } else {
-      lines.push(currentLine);
-      currentLine = word;
-    }
-  }
-  if (currentLine) lines.push(currentLine);
-  return lines;
-}
-
 function formatGermanDate(dateStr) {
   const d = new Date(dateStr);
   const day = String(d.getDate()).padStart(2,"0");
@@ -1348,73 +1329,85 @@ function formatGermanDate(dateStr) {
   return `${day}.${month}.${year}`;
 }
 
+function padText(text, length = MAX_CHARS) {
+  if (!text) return "-".padEnd(length," ");
+  if (text.length > length) return text.substring(0,length);
+  return text.padEnd(length," ");
+}
+
+// Prüft, ob Buchung aktuell oder in der Zukunft liegt
 function isFutureOrCurrent(b) {
+  if (!b.date || !b.start || !b.end) return false;
   const now = new Date();
   const todayStr = now.toISOString().split("T")[0];
   if (b.date > todayStr) return true;
   if (b.date === todayStr) {
     const currentMin = now.getHours()*60 + now.getMinutes();
-    const endMin = b.end.split(":")[0]*60 + b.end.split(":")[1]*1;
+    const endMin = parseInt(b.end.split(":")[0])*60 + parseInt(b.end.split(":")[1]);
     return currentMin <= endMin;
   }
   return false;
 }
 
+// Status berechnen
 function getStatus(bookings) {
   const now = new Date();
+  const todayStr = now.toISOString().split("T")[0];
   const currentMin = now.getHours()*60 + now.getMinutes();
-  const today = now.toISOString().split("T")[0];
-
+  
   for (let b of bookings) {
-    if (b.date !== today) continue;
-    const startMin = b.start.split(":")[0]*60 + b.start.split(":")[1]*1;
-    const endMin = b.end.split(":")[0]*60 + b.end.split(":")[1]*1;
+    if (b.date !== todayStr) continue;
+    const startMin = parseInt(b.start.split(":")[0])*60 + parseInt(b.start.split(":")[1]);
+    const endMin = parseInt(b.end.split(":")[0])*60 + parseInt(b.end.split(":")[1]);
     if (currentMin >= startMin && currentMin <= endMin) return "belegt";
   }
   return "frei";
 }
 
 // === RENDER ===
-function renderRoom(room) {
+function renderRoom(room, mode = "location") {
   const card = document.getElementById(room.id);
   if (!card) return;
 
-  const statusEl = card.querySelector(".room-status");
   const bookingContainer = card.querySelector(".booking-container");
+  const statusEl = card.querySelector(".room-status");
+  const maxBookings = mode === "location" ? MAX_BOOKINGS_LOCATION : MAX_BOOKINGS_DETAIL;
 
-  let relevantBookings = (room.bookings || [])
-    .filter(isFutureOrCurrent)
-    .slice(0, MAX_LINES);
+  bookingContainer.innerHTML = "";
 
-  // Mindestens 2 Buchungen
-  while (relevantBookings.length < 2) {
-    relevantBookings.push({date:"", start:"", end:"", person:""});
-  }
+  let relevantBookings = (room.bookings || []).filter(isFutureOrCurrent).slice(0,maxBookings);
 
-  // Status
+  // Mindestens 1 Buchung
+  if (relevantBookings.length === 0) relevantBookings.push({date:"", start:"", end:"", person:""});
+
+  // Status setzen
   const status = getStatus(relevantBookings);
   statusEl.textContent = status;
   statusEl.classList.toggle("text-red-400", status === "belegt");
   statusEl.classList.toggle("text-emerald-400", status === "frei");
 
-  // Alte Buchungen löschen
-  bookingContainer.innerHTML = "";
+ relevantBookings.forEach(b => {
+  // Zeile 1: Datum + Uhrzeit
+  const line1Text = b.date ? `HEUTE: ${formatGermanDate(b.date)} von ${b.start} bis ${b.end} Uhr` : "-";
+  const line1 = document.createElement("p");
+  line1.className = "text-zinc-400 text-sm font-mono mb-4";
+  line1.textContent = padText(line1Text);
+  bookingContainer.appendChild(line1);
 
-  relevantBookings.forEach(b => {
-    // Zeile 1: Datum + Uhrzeit
-    const line1Text = b.date ? `HEUTE: ${formatGermanDate(b.date)} von ${b.start} bis ${b.end} Uhr` : "-";
-    const line1 = document.createElement("p");
-    line1.className = "text-zinc-400 text-sm mb-0";
-    line1.textContent = line1Text.padEnd(MAX_CHARS, " ");
-    bookingContainer.appendChild(line1);
-
-    // Zeile 2: Person
-    const line2Text = b.person || "-";
+  if (b.person) {
+    // Zeile 2: Person (falls vorhanden)
     const line2 = document.createElement("p");
-    line2.className = "text-zinc-400 text-sm mb-2";
-    line2.textContent = line2Text.padEnd(MAX_CHARS, " ");
+    line2.className = "text-zinc-400 text-sm font-mono mb-4"; // Abstand zwischen Buchungen
+    line2.textContent = padText(b.person);
     bookingContainer.appendChild(line2);
-  });
+  } else {
+    // Wenn keine Person, keine zweite Zeile
+    const spacer = document.createElement("p");
+    spacer.className = "mb-4"; 
+    spacer.innerHTML = "&nbsp;"; // nur für Card-Höhe
+    bookingContainer.appendChild(spacer);
+  }
+});
 }
 
 // === LOAD DATA ===
@@ -1422,7 +1415,7 @@ async function loadRoomData() {
   try {
     const res = await fetch(DATA_URL);
     const data = await res.json();
-    data.rooms.forEach(renderRoom);
+    data.rooms.forEach(room => renderRoom(room, "location")); // oder "detail" für Einzelansicht
   } catch(err) {
     console.error("Fehler beim Laden:", err);
   }
@@ -1430,8 +1423,10 @@ async function loadRoomData() {
 
 document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
+
   
 </html>
+
 
 
 
