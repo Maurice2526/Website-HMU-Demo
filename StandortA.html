@@ -1362,7 +1362,7 @@ function formatDay(bDate) {
 
   if (todayStr === bStr) return "HEUTE"; // bleibt unverändert
   const dayNames = ["SO","MO","DI","MI","DO","FR","SA"];
-  return dayNames[new Date(bDate).getDay()].padEnd(5,"\u00A0\u00A0\u00A0"); // z.B. "MO   "
+  return dayNames[new Date(bDate).getDay()].padEnd(5,"\u00A0"); // z.B. "MO   "
 }
 
 // Text auf MAX_CHARS auffüllen
@@ -1407,17 +1407,19 @@ function renderRoom(room, mode = "location") {
     const isLastBooking = idx === relevantBookings.length - 1;
 
     // Zeile 1: Tag + Datum + Uhrzeit
-    const dayText = formatDay(b.date);
+    const dayText = formatDay(b.date); // z.B. "HEUTE" oder "DO"
     const dateText = b.date ? formatGermanDate(b.date) : "";
     const timeText = (b.start && b.end) ? `von ${b.start} bis ${b.end} Uhr` : "";
-
+    
+    // Einfach Tag + ":" direkt an Datum + Zeit
     let line1Content = b.date ? `${dayText}: ${dateText} ${timeText}` : "-";
     line1Content = padText(line1Content);
-
+    
     const line1 = document.createElement("p");
     line1.className = "text-zinc-400 text-sm leading-5";
     line1.textContent = line1Content;
     bookingContainer.appendChild(line1);
+
 
     // Zeile 2: Person oder unsichtbare Zeichen
     let line2Content = b.person ? b.person : "\u00A0".repeat(MAX_CHARS);
@@ -1446,6 +1448,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
