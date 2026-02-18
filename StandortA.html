@@ -1425,7 +1425,7 @@ function renderRoom(room, mode = "location") {
     
     // Abstand zwischen Buchungen
     line2.className =
-      "text-zinc-400 text-sm leading-5 pl-2" + 
+      "text-zinc-400 text-sm leading-5 pl-3" + 
       ((mode === "location" && isLastBooking) ? "" : " mb-4");
     
     if (b.person) {
@@ -1453,6 +1453,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
