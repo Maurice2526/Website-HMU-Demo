@@ -1425,7 +1425,7 @@ function renderRoom(room, mode = "location") {
     let line2Content;
     if (b.person) {
       // Zwei unsichtbare Zeichen vor den Namen setzen
-      line2Content = "\u00A0\u00A0" + b.person;
+      line2Content = "\u00A0".repeat(2) + b.person;
     } else {
       // Wenn keine Person, gesamte Zeile unsichtbar auffüllen
       line2Content = "\u00A0".repeat(MAX_CHARS);
@@ -1456,6 +1456,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
