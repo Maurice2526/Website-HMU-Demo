@@ -1316,7 +1316,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <!-- Daten Import Scraper (GitHub) -->
 <script>
 const DATA_URL = "https://raw.githubusercontent.com/Maurice2526/Scraper/main/rooms.json";
-const MAX_CHARS = 41; // max 41 Zeichen pro Zeile
+const MAX_CHARS = 39; 
 const MAX_BOOKINGS_LOCATION = 2;
 const MAX_BOOKINGS_DETAIL = 7;
 
@@ -1336,7 +1336,6 @@ function padText(text, length = MAX_CHARS) {
   return text.padEnd(length," ");
 }
 
-// Prüft, ob Buchung aktuell oder in der Zukunft liegt
 function isFutureOrCurrent(b) {
   if (!b.date || !b.start || !b.end) return false;
   const now = new Date();
@@ -1350,7 +1349,6 @@ function isFutureOrCurrent(b) {
   return false;
 }
 
-// Status berechnen
 function getStatus(bookings) {
   const now = new Date();
   const todayStr = now.toISOString().split("T")[0];
@@ -1378,7 +1376,6 @@ function renderRoom(room, mode = "location") {
 
   let relevantBookings = (room.bookings || []).filter(isFutureOrCurrent).slice(0,maxBookings);
 
-  // Mindestens 1 Buchung
   if (relevantBookings.length === 0) relevantBookings.push({date:"", start:"", end:"", person:""});
 
   // Status setzen
@@ -1388,17 +1385,19 @@ function renderRoom(room, mode = "location") {
   statusEl.classList.toggle("text-emerald-400", status === "frei");
 
   relevantBookings.forEach((b, idx) => {
+    const isLastBooking = idx === relevantBookings.length - 1;
+
     // Zeile 1: Datum + Uhrzeit
-    const line1Text = b.date ? `- HEUTE: ${formatGermanDate(b.date)} von ${b.start} bis ${b.end} Uhr` : "-";
+    const line1Text = b.date ? `HEUTE: ${formatGermanDate(b.date)} von ${b.start} bis ${b.end} Uhr` : "-";
     const line1 = document.createElement("p");
-    line1.className = "text-zinc-400 text-sm"; 
+    line1.className = "text-zinc-400 text-sm leading-5"; 
     line1.textContent = padText(line1Text);
     bookingContainer.appendChild(line1);
 
     // Zeile 2: Person oder unsichtbar für Card-Höhe
     const line2 = document.createElement("p");
-    line2.className = "text-zinc-400 text-sm mb-4"; // Abstand zwischen Buchungen
-    line2.textContent = b.person ?   padText(b.person) : "\u00A0".repeat(MAX_CHARS);
+    line2.className = "text-zinc-400 text-sm leading-5" + (isLastBooking ? "" : " mb-2"); 
+    line2.textContent = b.person ? padText(b.person) : "\u00A0".repeat(MAX_CHARS);
     bookingContainer.appendChild(line2);
   });
 }
@@ -1418,6 +1417,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
