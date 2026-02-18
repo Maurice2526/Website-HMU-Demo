@@ -683,7 +683,7 @@ body.preload {
             </h3>
             <span class="room-status text-sm font-medium mt-1"></span>
           </div>
-            <div class="booking-container text-sm text-zinc-400 mb-4 space-y-4"></div>
+            <div class="booking-container text-sm text-zinc-400 mb-4"></div>
           </div>
       </div>
 
@@ -1424,7 +1424,7 @@ function renderRoom(room, mode = "location") {
   } else {
     relevant.forEach(b => {
       const line1 =
-        `HEUTE ${formatGermanDate(b.date)} ${b.start}-${b.end}`;
+        `HEUTE ${formatGermanDate(b.date)} von ${b.start} bis ${b.end} Uhr`;
       const line2 = b.person || "";
 
       renderedLines.push(padLine(line1));
@@ -1466,6 +1466,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
