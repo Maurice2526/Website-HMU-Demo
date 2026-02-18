@@ -1403,32 +1403,38 @@ function renderRoom(room, mode = "location") {
     else hoverDiv.classList.add("bg-green-400/50");
   }
 
-  relevantBookings.forEach((b, idx) => {
-    const isLastBooking = idx === relevantBookings.length - 1;
+ relevantBookings.forEach((b, idx) => {
+  const isLastBooking = idx === relevantBookings.length - 1;
 
-    // Zeile 1: Tag + Datum + Zeit
-    let dayText = formatDay(b.date); // z.B. "HEUTE" oder "MO   "
-    let dateText = b.date ? formatGermanDate(b.date) : "";
-    let timeText = (b.start && b.end) ? `von ${b.start} bis ${b.end} Uhr` : "";
-    
-    const line1Text = b.date 
-      ? `${dayText}: ${dateText} ${timeText}` 
-      : "-";
-    
-    // padText nur auf den Rest anwenden, Tag bleibt gefüllt
-    const line1 = document.createElement("p");
-    line1.className = "text-zinc-400 text-sm leading-5";
-    line1.textContent = padText(line1Text);
-    bookingContainer.appendChild(line1);
+  // Tag auffüllen: HEUTE oder Wochentag (5 Zeichen)
+  let dayText = formatDay(b.date); // HEUTE oder MO   etc.
 
+  // Datum und Zeit
+  let dateText = b.date ? formatGermanDate(b.date) : "";
+  let timeText = (b.start && b.end) ? `von ${b.start} bis ${b.end} Uhr` : "";
 
-    // Zeile 2: Person oder unsichtbar
-    const line2 = document.createElement("p");
-    line2.className = "text-zinc-400 text-sm leading-5" + (isLastBooking ? "" : " mb-4");
-    line2.textContent = b.person ? padText(b.person) : "\u00A0".repeat(MAX_CHARS);
-    bookingContainer.appendChild(line2);
-  });
-}
+  // Zeile 1 zusammenbauen
+  let line1Content = b.date 
+    ? `${dayText}: ${dateText} ${timeText}` 
+    : "-";
+
+  // Gesamtlänge auf MAX_CHARS auffüllen
+  line1Content = padText(line1Content);
+
+  const line1 = document.createElement("p");
+  line1.className = "text-zinc-400 text-sm leading-5";
+  line1.textContent = line1Content;
+  bookingContainer.appendChild(line1);
+
+  // Zeile 2: Person oder unsichtbare Zeichen
+  let line2Content = b.person ? b.person : "\u00A0".repeat(MAX_CHARS);
+  line2Content = padText(line2Content); // sicherstellen, dass 39 Zeichen
+
+  const line2 = document.createElement("p");
+  line2.className = "text-zinc-400 text-sm leading-5" + (isLastBooking ? "" : " mb-2");
+  line2.textContent = line2Content;
+  bookingContainer.appendChild(line2);
+});
 
 // === LOAD DATA ===
 async function loadRoomData() {
@@ -1445,6 +1451,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
