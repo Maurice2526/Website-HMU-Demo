@@ -1363,14 +1363,14 @@ function getStatus(bookings) {
 function formatDay(bDate) {
   if (!bDate) return "-";
   const now = new Date();
-  const b = new Date(bDate);
   const todayStr = now.toISOString().split("T")[0];
-  const bStr = b.toISOString().split("T")[0];
+  const bStr = new Date(bDate).toISOString().split("T")[0];
 
-  if (todayStr === bStr) return "HEUTE";
-  const dayNames = ["SO", "MO", "DI", "MI", "DO", "FR", "SA"];
-  return dayNames[b.getDay()].padEnd(5," "); // z.B. "MO   "
+  if (todayStr === bStr) return "HEUTE"; // bleibt unverändert
+  const dayNames = ["SO","MO","DI","MI","DO","FR","SA"];
+  return dayNames[new Date(bDate).getDay()].padEnd(5, " "); // z.B. "MO   "
 }
+
 
 // === RENDER ===
 function renderRoom(room, mode = "location") {
@@ -1407,12 +1407,20 @@ function renderRoom(room, mode = "location") {
     const isLastBooking = idx === relevantBookings.length - 1;
 
     // Zeile 1: Tag + Datum + Zeit
-    const dayText = formatDay(b.date);
-    const line1Text = b.date ? `${dayText}: ${formatGermanDate(b.date)} von ${b.start} bis ${b.end} Uhr` : "-";
+    let dayText = formatDay(b.date); // z.B. "HEUTE" oder "MO   "
+    let dateText = b.date ? formatGermanDate(b.date) : "";
+    let timeText = (b.start && b.end) ? `von ${b.start} bis ${b.end} Uhr` : "";
+    
+    const line1Text = b.date 
+      ? `${dayText}: ${dateText} ${timeText}` 
+      : "-";
+    
+    // padText nur auf den Rest anwenden, Tag bleibt gefüllt
     const line1 = document.createElement("p");
     line1.className = "text-zinc-400 text-sm leading-5";
     line1.textContent = padText(line1Text);
     bookingContainer.appendChild(line1);
+
 
     // Zeile 2: Person oder unsichtbar
     const line2 = document.createElement("p");
@@ -1437,6 +1445,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
