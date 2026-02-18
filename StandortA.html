@@ -1316,7 +1316,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <!-- Daten Import Scraper (GitHub) -->
 <script>
 const DATA_URL = "https://raw.githubusercontent.com/Maurice2526/Scraper/main/rooms.json";
-const MAX_CHARS = 39; 
+const MAX_CHARS = 44; 
 const MAX_BOOKINGS_LOCATION = 2;
 const MAX_BOOKINGS_DETAIL = 7;
 
@@ -1396,27 +1396,37 @@ if (hoverDiv) {
   relevantBookings.forEach((b, idx) => {
     const isLastBooking = idx === relevantBookings.length - 1;
 
-  // Zeile 1: Datum/Uhrzeit oder Wochentag
-  let line1Text;
-  if (!b.date) {
-    line1Text = "-";
-  } else {
-    const todayStr = new Date().toISOString().split("T")[0];
+    // Zeile 1: Datum + Uhrzeit
+  let dayStr = "";
+  if (b.date) {
     const d = new Date(b.date);
-    if (b.date === todayStr) {
-      line1Text = `HEUTE: ${formatGermanDate(b.date)} von ${b.start} bis ${b.end} Uhr`;
+    const weekdays = ["SONNTAG","MONTAG","DIENSTAG","MITTWOCH","DONNERSTAG","FREITAG","SAMSTAG"];
+    const weekday = weekdays[d.getDay()]; // Wochentag
+    if (formatGermanDate(b.date) === formatGermanDate(new Date())) {
+      dayStr = "HEUTE";
     } else {
-      // Wochentag + Datum für zukünftige Termine
-      const weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
-      const weekdayName = weekdays[d.getDay()];
-      line1Text = `${weekdayName}: ${formatGermanDate(b.date)} von ${b.start} bis ${b.end} Uhr`;
+      dayStr = weekday; // z.B. "MONTAG"
     }
   }
   
+  const line1Text = b.date
+    ? `${dayStr}: ${formatGermanDate(b.date)} von ${b.start} bis ${b.end} Uhr`
+    : "-";
+  
   const line1 = document.createElement("p");
-  line1.className = "text-zinc-400 text-sm leading-5"; // leading-5 = Zeilenhöhe
-  line1.textContent = padText(line1Text);
+  line1.className = "text-zinc-400 text-sm leading-5";
+  
+  // Wochentag fetter machen
+  if (dayStr && dayStr !== "HEUTE") {
+    line1.innerHTML = line1Text.replace(
+      dayStr,
+      `<span class="font-semibold">${dayStr}</span>`
+    );
+  } else {
+    line1.textContent = line1Text;
+  }
   bookingContainer.appendChild(line1);
+
   
   // Zeile 2: Person oder unsichtbar, Abstand nur zwischen Buchungen
   const line2 = document.createElement("p");
@@ -1442,6 +1452,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
