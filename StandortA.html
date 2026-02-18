@@ -1316,7 +1316,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <!-- Daten Import Scraper (GitHub) -->
 <script>
 const DATA_URL = "https://raw.githubusercontent.com/Maurice2526/Scraper/main/rooms.json";
-const MAX_CHARS = 40; // max 40 Zeichen pro Zeile
+const MAX_CHARS = 41; // max 41 Zeichen pro Zeile
 const MAX_BOOKINGS_LOCATION = 2;
 const MAX_BOOKINGS_DETAIL = 7;
 
@@ -1398,7 +1398,7 @@ function renderRoom(room, mode = "location") {
     // Zeile 2: Person oder unsichtbar für Card-Höhe
     const line2 = document.createElement("p");
     line2.className = "text-zinc-400 text-sm mb-4"; // Abstand zwischen Buchungen
-    line2.textContent = b.person ? padText(b.person) : "\u00A0".repeat(MAX_CHARS);
+    line2.textContent = b.person ?   padText(b.person) : "\u00A0".repeat(MAX_CHARS);
     bookingContainer.appendChild(line2);
   });
 }
@@ -1418,6 +1418,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
