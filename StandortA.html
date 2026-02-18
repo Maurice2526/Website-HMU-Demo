@@ -1316,7 +1316,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <!-- Daten Import Scraper (GitHub) -->
 <script>
 const DATA_URL = "https://raw.githubusercontent.com/Maurice2526/Scraper/main/rooms.json";
-const MAX_CHARS = 39; 
+const MAX_CHARS = 41; 
 const MAX_BOOKINGS_LOCATION = 2;
 const MAX_BOOKINGS_DETAIL = 7;
 
@@ -1422,14 +1422,22 @@ function renderRoom(room, mode = "location") {
 
 
     // Zeile 2: Person oder unsichtbare Zeichen
-    let line2Content = b.person ? b.person : "\u00A0".repeat(MAX_CHARS);
+    let line2Content;
+    if (b.person) {
+      // Zwei unsichtbare Zeichen vor den Namen setzen
+      line2Content = "\u00A0\u00A0" + b.person;
+    } else {
+      // Wenn keine Person, gesamte Zeile unsichtbar auffüllen
+      line2Content = "\u00A0".repeat(MAX_CHARS);
+    }
     line2Content = padText(line2Content);
-
+    
     const line2 = document.createElement("p");
     // Abstand zwischen Buchungen, nur wenn nicht die letzte Buchung in Standortansicht
     line2.className = "text-zinc-400 text-sm leading-5" + ((mode === "location" && isLastBooking) ? "" : " mb-4");
     line2.textContent = line2Content;
     bookingContainer.appendChild(line2);
+
   });
 }
 
@@ -1448,6 +1456,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
