@@ -1425,7 +1425,7 @@ function renderRoom(room, mode = "location") {
 
     const line2 = document.createElement("p");
     // Abstand zwischen Buchungen, nur wenn nicht die letzte Buchung in Standortansicht
-    line2.className = "text-zinc-400 text-sm leading-5" + ((mode === "location" && isLastBooking) ? "" : " mb-2");
+    line2.className = "text-zinc-400 text-sm leading-5" + ((mode === "location" && isLastBooking) ? "" : " mb-4");
     line2.textContent = line2Content;
     bookingContainer.appendChild(line2);
   });
@@ -1440,7 +1440,7 @@ function formatDay(bDate) {
 
   if (todayStr === bStr) return "HEUTE"; // heute
   const dayNames = ["SO","MO","DI","MI","DO","FR","SA"];
-  return dayNames[new Date(bDate).getDay()].padEnd(5, " "); // MO + 3 Leerzeichen
+  return dayNames[new Date(bDate).getDay()].padEnd(5, "   "); // MO + 3 Leerzeichen
 }
 
 // Text auf MAX_CHARS auffüllen
@@ -1465,6 +1465,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
