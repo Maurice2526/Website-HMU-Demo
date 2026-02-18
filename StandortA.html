@@ -1439,8 +1439,8 @@ function formatDay(bDate) {
   const bStr = new Date(bDate).toISOString().split("T")[0];
 
   if (todayStr === bStr) return "HEUTE"; // heute
-  const dayNames = ["SO","MO","DI","MI","DO","FR","SA"];
-  return dayNames[new Date(bDate).getDay()].padEnd(5, "   "); // MO + 3 Leerzeichen
+  const dayNames = ["SO","MO","DI","MI","DO ","FR","SA"];
+  return dayNames[new Date(bDate).getDay()].padEnd(5, " "); // MO + 3 Leerzeichen
 }
 
 // Text auf MAX_CHARS auffüllen
@@ -1465,6 +1465,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
