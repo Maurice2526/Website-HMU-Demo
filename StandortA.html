@@ -1420,22 +1420,21 @@ function renderRoom(room, mode = "location") {
     line1.textContent = line1Content;
     bookingContainer.appendChild(line1);
 
-// Zeile 2: Person oder unsichtbare Zeichen
-const line2 = document.createElement("p");
-
-// Abstand zwischen Buchungen, nur wenn nicht die letzte Buchung in Standortansicht
-line2.className = "text-zinc-400 text-sm leading-5" + ((mode === "location" && isLastBooking) ? "" : " mb-4");
-
-if (b.person) {
-  // Zwei unsichtbare Zeichen vor dem Namen setzen
-  line2.innerHTML = "&nbsp;&nbsp;" + b.person;
-} else {
-  // Wenn keine Person, gesamte Zeile unsichtbar auffüllen
-  line2.innerHTML = "&nbsp;".repeat(MAX_CHARS);
-}
-
-bookingContainer.appendChild(line2);
-
+    // Zeile 2: Person oder unsichtbare Zeichen
+    const line2 = document.createElement("p");
+    
+    // Abstand zwischen Buchungen
+    line2.className =
+      "text-zinc-400 text-sm leading-5 pl-4" + 
+      ((mode === "location" && isLastBooking) ? "" : " mb-4");
+    
+    if (b.person) {
+      line2.textContent = padText(b.person);
+    } else {
+      line2.innerHTML = "&nbsp;".repeat(MAX_CHARS);
+    }
+    
+    bookingContainer.appendChild(line2);
   });
 }
 
@@ -1454,6 +1453,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
