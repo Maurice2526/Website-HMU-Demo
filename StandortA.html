@@ -1330,12 +1330,6 @@ function formatGermanDate(dateStr) {
   return `${day}.${month}.${year}`;
 }
 
-function padText(text, length = MAX_CHARS) {
-  if (!text) return "-".padEnd(length," ");
-  if (text.length > length) return text.substring(0,length);
-  return text.padEnd(length," ");
-}
-
 // Prüft, ob Buchung heute oder in der Zukunft liegt
 function isTodayOrFuture(b) {
   if (!b.date || !b.start || !b.end) return false;
@@ -1368,9 +1362,15 @@ function formatDay(bDate) {
 
   if (todayStr === bStr) return "HEUTE"; // bleibt unverändert
   const dayNames = ["SO","MO","DI","MI","DO","FR","SA"];
-  return dayNames[new Date(bDate).getDay()].padEnd(5, "\u00A0"); // z.B. "MO   "
+  return dayNames[new Date(bDate).getDay()].padEnd(5,"\u00A0"); // z.B. "MO   "
 }
 
+// Text auf MAX_CHARS auffüllen
+function padText(text, length = MAX_CHARS) {
+  if (!text) return "\u00A0".repeat(length);
+  if (text.length > length) return text.substring(0, length);
+  return text.padEnd(length,"\u00A0");
+}
 
 // === RENDER ===
 function renderRoom(room, mode = "location") {
@@ -1379,7 +1379,7 @@ function renderRoom(room, mode = "location") {
 
   const bookingContainer = card.querySelector(".booking-container");
   const statusEl = card.querySelector(".room-status");
-  const maxBookings = mode === "location" ? 2 : 7;
+  const maxBookings = mode === "location" ? MAX_BOOKINGS_LOCATION : MAX_BOOKINGS_DETAIL;
 
   bookingContainer.innerHTML = "";
 
@@ -1407,9 +1407,9 @@ function renderRoom(room, mode = "location") {
     const isLastBooking = idx === relevantBookings.length - 1;
 
     // Zeile 1: Tag + Datum + Uhrzeit
-    let dayText = formatDay(b.date); // HEUTE oder MO, DI ...
-    let dateText = b.date ? formatGermanDate(b.date) : "";
-    let timeText = (b.start && b.end) ? `von ${b.start} bis ${b.end} Uhr` : "";
+    const dayText = formatDay(b.date);
+    const dateText = b.date ? formatGermanDate(b.date) : "";
+    const timeText = (b.start && b.end) ? `von ${b.start} bis ${b.end} Uhr` : "";
 
     let line1Content = b.date ? `${dayText}: ${dateText} ${timeText}` : "-";
     line1Content = padText(line1Content);
@@ -1431,25 +1431,6 @@ function renderRoom(room, mode = "location") {
   });
 }
 
-// Helfer: Tag formatieren (HEUTE oder Wochentag)
-function formatDay(bDate) {
-  if (!bDate) return "-";
-  const now = new Date();
-  const todayStr = now.toISOString().split("T")[0];
-  const bStr = new Date(bDate).toISOString().split("T")[0];
-
-  if (todayStr === bStr) return "HEUTE"; // heute
-  const dayNames = ["SO","MO","DI","MI","DO","FR","SA"];
-  return dayNames[new Date(bDate).getDay()].padEnd(5,"\u00A0"); // MO + 3 Leerzeichen
-}
-
-// Text auf MAX_CHARS auffüllen
-function padText(text, length = MAX_CHARS) {
-  if (!text) return "\u00A0".repeat(length);
-  if (text.length > length) return text.substring(0, length);
-  return text.padEnd(length, "");
-}
-
 // === LOAD DATA ===
 async function loadRoomData() {
   try {
@@ -1465,6 +1446,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
