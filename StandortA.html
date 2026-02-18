@@ -1383,7 +1383,7 @@ function renderRoom(room, mode = "location") {
   // Status setzen
   const status = getStatus(relevantBookings);
   statusEl.textContent = status;
-  statusEl.classList.toggle("text-red-400", status === "belegt");
+  statusEl.classList.toggle("text-red-500", status === "belegt");
   statusEl.classList.toggle("text-emerald-400", status === "frei");
 
  relevantBookings.forEach(b => {
@@ -1397,13 +1397,13 @@ function renderRoom(room, mode = "location") {
   if (b.person) {
     // Zeile 2: Person (falls vorhanden)
     const line2 = document.createElement("p");
-    line2.className = "text-zinc-400 text-sm mb-2"; // Abstand zwischen Buchungen
+    line2.className = "text-zinc-400 text-sm mb-4"; // Abstand zwischen Buchungen
     line2.textContent = padText(b.person);
     bookingContainer.appendChild(line2);
   } else {
     // Wenn keine Person, keine zweite Zeile
     const spacer = document.createElement("p");
-    spacer.className = "mb-2"; 
+    spacer.className = "mb-4"; 
     spacer.innerHTML = "&nbsp;"; // nur für Card-Höhe
     bookingContainer.appendChild(spacer);
   }
@@ -1426,6 +1426,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 
   
 </html>
+
 
 
 
