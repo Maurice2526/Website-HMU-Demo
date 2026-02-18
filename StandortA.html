@@ -1394,7 +1394,7 @@ function renderRoom(room, mode = "location") {
 
     // Zeile 2: Person oder unsichtbar
     const line2 = document.createElement("p");
-    line2.className = "text-zinc-400 text-sm leading-5" + (isLastBooking ? "" : " mb-2");
+    line2.className = "text-zinc-400 text-sm leading-5" + (isLastBooking ? "" : " mb-4");
     line2.textContent = b.person ? padText(b.person) : "\u00A0".repeat(MAX_CHARS);
     bookingContainer.appendChild(line2);
   });
@@ -1415,6 +1415,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
