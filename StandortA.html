@@ -1316,7 +1316,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <!-- Daten Import Scraper (GitHub) -->
 <script>
 const DATA_URL = "https://raw.githubusercontent.com/Maurice2526/Scraper/main/rooms.json";
-const MAX_CHARS = 44; 
+const MAX_CHARS = 39; 
 const MAX_BOOKINGS_LOCATION = 2;
 const MAX_BOOKINGS_DETAIL = 7;
 
@@ -1400,12 +1400,12 @@ if (hoverDiv) {
   let dayStr = "";
   if (b.date) {
     const d = new Date(b.date);
-    const weekdays = ["SONNTAG","MONTAG","DIENSTAG","MITTWOCH","DONNERSTAG","FREITAG","SAMSTAG"];
+    const weekdays = ["SO   ","MO   ","DI   ","MI   ","DO   ","FR   ","SA   "];
     const weekday = weekdays[d.getDay()]; // Wochentag
     if (formatGermanDate(b.date) === formatGermanDate(new Date())) {
       dayStr = "HEUTE";
     } else {
-      dayStr = weekday; // z.B. "MONTAG"
+      dayStr = weekday; // z.B. "MO"
     }
   }
   
@@ -1452,6 +1452,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
