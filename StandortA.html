@@ -1362,7 +1362,7 @@ function formatDay(bDate) {
 
   if (todayStr === bStr) return "HEUTE"; // bleibt unverändert
   const dayNames = ["SO","MO","DI","MI","DO","FR","SA"];
-  return dayNames[new Date(bDate).getDay()].padEnd(5,"\u00A0"); // z.B. "MO   "
+  return dayNames[new Date(bDate).getDay()].padEnd(5,"\u00A0\u00A0\u00A0"); // z.B. "MO   "
 }
 
 // Text auf MAX_CHARS auffüllen
@@ -1446,6 +1446,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
