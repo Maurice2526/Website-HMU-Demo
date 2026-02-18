@@ -1440,14 +1440,14 @@ function formatDay(bDate) {
 
   if (todayStr === bStr) return "HEUTE"; // heute
   const dayNames = ["SO","MO","DI","MI","DO","FR","SA"];
-  return dayNames[new Date(bDate).getDay()].padEnd(5); // MO + 3 Leerzeichen
+  return dayNames[new Date(bDate).getDay()].padEnd(5,"\u00A0"); // MO + 3 Leerzeichen
 }
 
 // Text auf MAX_CHARS auffüllen
 function padText(text, length = MAX_CHARS) {
   if (!text) return "\u00A0".repeat(length);
   if (text.length > length) return text.substring(0, length);
-  return text.padEnd(length, "\u00A0");
+  return text.padEnd(length, "");
 }
 
 // === LOAD DATA ===
@@ -1465,6 +1465,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
