@@ -1382,21 +1382,48 @@ function renderRoom(room, mode = "location") {
   statusEl.classList.toggle("text-red-500", status === "belegt");
   statusEl.classList.toggle("text-emerald-400", status === "frei");
 
+  // === HOVER-HINTERGRUND DYNAMISCH AN STATUS BINDEN ===
+const hoverDiv = card.querySelector("div.absolute");
+if (hoverDiv) {
+  // Vorherige Hover-Farben entfernen
+  hoverDiv.classList.remove("bg-green-400/50", "bg-red-400/50");
+
+  // Neue Hover-Farbe basierend auf Status setzen
+  if (status === "belegt") hoverDiv.classList.add("bg-red-400/50");
+  else hoverDiv.classList.add("bg-green-400/50");
+}
+
   relevantBookings.forEach((b, idx) => {
     const isLastBooking = idx === relevantBookings.length - 1;
 
-    // Zeile 1: Datum + Uhrzeit
-    const line1Text = b.date ? `HEUTE: ${formatGermanDate(b.date)} von ${b.start} bis ${b.end} Uhr` : "-";
-    const line1 = document.createElement("p");
-    line1.className = "text-zinc-400 text-sm leading-5"; 
-    line1.textContent = padText(line1Text);
-    bookingContainer.appendChild(line1);
+  // Zeile 1: Datum/Uhrzeit oder Wochentag
+  let line1Text;
+  if (!b.date) {
+    line1Text = "-";
+  } else {
+    const todayStr = new Date().toISOString().split("T")[0];
+    const d = new Date(b.date);
+    if (b.date === todayStr) {
+      line1Text = `HEUTE: ${formatGermanDate(b.date)} von ${b.start} bis ${b.end} Uhr`;
+    } else {
+      // Wochentag + Datum für zukünftige Termine
+      const weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+      const weekdayName = weekdays[d.getDay()];
+      line1Text = `${weekdayName}: ${formatGermanDate(b.date)} von ${b.start} bis ${b.end} Uhr`;
+    }
+  }
+  
+  const line1 = document.createElement("p");
+  line1.className = "text-zinc-400 text-sm leading-5"; // leading-5 = Zeilenhöhe
+  line1.textContent = padText(line1Text);
+  bookingContainer.appendChild(line1);
+  
+  // Zeile 2: Person oder unsichtbar, Abstand nur zwischen Buchungen
+  const line2 = document.createElement("p");
+  line2.className = "text-zinc-400 text-sm leading-5" + (idx === relevantBookings.length - 1 ? "" : " mb-4");
+  line2.textContent = b.person ? padText(b.person) : "\u00A0".repeat(MAX_CHARS);
+  bookingContainer.appendChild(line2);
 
-    // Zeile 2: Person oder unsichtbar
-    const line2 = document.createElement("p");
-    line2.className = "text-zinc-400 text-sm leading-5" + (isLastBooking ? "" : " mb-4");
-    line2.textContent = b.person ? padText(b.person) : "\u00A0".repeat(MAX_CHARS);
-    bookingContainer.appendChild(line2);
   });
 }
 
@@ -1415,6 +1442,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
