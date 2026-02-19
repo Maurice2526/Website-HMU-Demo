@@ -1422,7 +1422,7 @@ relevantBookings.forEach((b, idx) => {
     line1.textContent = padText(`${weekday}: ${date} ${timeText}`);
   } else {
     // Platzhalter: sichtbares "-" + Rest invisible
-    line1.innerHTML = `- Keine Belegung -<span class="invisible">######################################</span>`;
+    line1.innerHTML = `- Keine Belegung -<span class="invisible">#####################</span>`;
   }
 
   bookingContainer.appendChild(line1);
@@ -1437,7 +1437,7 @@ relevantBookings.forEach((b, idx) => {
     line2.textContent = padText(b.person);
   } else {
     // Zeile 2 komplett invisible
-    line2.innerHTML = `<span class="invisible">#######################################</span>`;
+    line2.innerHTML = `<span class="invisible">#####################</span>`;
   }
 
   bookingContainer.appendChild(line2);
@@ -1459,6 +1459,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
