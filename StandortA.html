@@ -1429,7 +1429,7 @@ function renderRoom(room, mode = "location") {
     if (b && b.person) {
       line2.textContent = padText(b.person);
     } else {
-      line2.innerHTML = `- Keine Belegung -<span class="invisible">#####################</span>`;
+      line2.innerHTML = `<span class="invisible">#######################################</span>`;
     }
     bookingContainer.appendChild(line2);
   });
@@ -1450,6 +1450,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
