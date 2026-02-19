@@ -1403,8 +1403,13 @@ function renderRoom(room, mode = "location") {
     else hoverDiv.classList.add("bg-green-400/50");
   }
 
-  relevantBookings.forEach((b, idx) => {
-  const isLast = idx === relevantBookings.length - 1;
+ // Immer 2 Buchungsblöcke für Grid
+while (relevantBookings.length < 2) {
+  relevantBookings.push(null);
+}
+
+relevantBookings.forEach((b, idx) => {
+  const isLast = idx === 1; // max 2 Buchungen, idx 0 oder 1
 
   // Zeile 1: Tag + Datum + Uhrzeit
   const line1 = document.createElement("p");
@@ -1414,11 +1419,10 @@ function renderRoom(room, mode = "location") {
     const weekday = formatWeekday(b.date);
     const date = formatGermanDate(b.date);
     const timeText = b.start && b.end ? `von ${b.start} bis ${b.end} Uhr` : "";
-    line1.textContent = `${weekday}: ${date} ${timeText}`;
-    line1.textContent = padText(line1.textContent); // optional auffüllen
+    line1.textContent = padText(`${weekday}: ${date} ${timeText}`);
   } else {
-    // Platzhalter mit invisible Span (Option 3)
-    line1.innerHTML = `-<span class="invisible">-#######################################</span>`;
+    // Platzhalter: sichtbares "-" + Rest invisible
+    line1.innerHTML = `- Keine Belegung -<span class="invisible">######################################</span>`;
   }
 
   bookingContainer.appendChild(line1);
@@ -1432,7 +1436,7 @@ function renderRoom(room, mode = "location") {
   if (b && b.person) {
     line2.textContent = padText(b.person);
   } else {
-    // unsichtbare 39 Zeichen
+    // Zeile 2 komplett invisible
     line2.innerHTML = `<span class="invisible">#######################################</span>`;
   }
 
@@ -1455,6 +1459,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
