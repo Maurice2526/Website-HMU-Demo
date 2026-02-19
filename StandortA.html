@@ -1403,27 +1403,28 @@ function renderRoom(room, mode = "location") {
     else hoverDiv.classList.add("bg-green-400/50");
   }
 
-relevantBookings.forEach((b, idx) => {
-  const isLast = idx === relevantBookings.length - 1;
+  futureBookings.forEach((b, idx) => {
+  const isLast = idx === MAX_BOOKINGS - 1;
 
-  // Zeile 1: Tag + Datum + Uhrzeit
+  // --- Zeile 1 ---
   const line1 = document.createElement("p");
   line1.className = "text-zinc-400 text-sm leading-5 whitespace-pre";
 
-  if (b && b.date) {
+  if (b) {
+    // echte Buchung
     const weekday = formatWeekday(b.date);
     const date = formatGermanDate(b.date);
     const timeText = b.start && b.end ? `von ${b.start} bis ${b.end} Uhr` : "";
-    line1.textContent = `${weekday}: ${date} ${timeText}`;
-    line1.textContent = padText(line1.textContent); // optional auffüllen
+    line1.textContent = padText(`${weekday}: ${date} ${timeText}`);
   } else {
-    // Platzhalter mit invisible Span (Option 3)
-    line1.innerHTML = `<span class="invisible">-#########################################</span>`;
+    // Zeile 1: sichtbares "-" + Rest invisible
+    const invisibleSpacer = "######################################"; // 38 unsichtbare Zeichen
+    line1.innerHTML = `-<span class="invisible">${invisibleSpacer}</span>`;
   }
 
   bookingContainer.appendChild(line1);
 
-  // Zeile 2: Person
+  // --- Zeile 2 ---
   const line2 = document.createElement("p");
   line2.className =
     "text-zinc-400 text-sm leading-5 whitespace-pre pl-2" +
@@ -1432,8 +1433,8 @@ relevantBookings.forEach((b, idx) => {
   if (b && b.person) {
     line2.textContent = padText(b.person);
   } else {
-    // unsichtbare 39 Zeichen
-    line2.innerHTML = `<span class="invisible">#########################################</span>`;
+    // Zeile 2: komplett invisible 39 Zeichen
+    line2.innerHTML = `<span class="invisible">#######################################</span>`;
   }
 
   bookingContainer.appendChild(line2);
@@ -1456,6 +1457,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
