@@ -1403,39 +1403,42 @@ function renderRoom(room, mode = "location") {
     else hoverDiv.classList.add("bg-green-400/50");
   }
 
-  relevantBookings.forEach((b, idx) => {
-    const isLastBooking = idx === relevantBookings.length - 1;
+relevantBookings.forEach((b, idx) => {
+  const isLast = idx === relevantBookings.length - 1;
 
-    // Zeile 1: Tag + Datum + Uhrzeit
-    const dayText = formatDay(b.date); // z.B. "HEUTE" oder "DO"
-    const dateText = b.date ? formatGermanDate(b.date) : "";
-    const timeText = (b.start && b.end) ? `von ${b.start} bis ${b.end} Uhr` : "";
-    
-    // Einfach Tag + ":" direkt an Datum + Zeit
-    let line1Content = b.date ? `${dayText}: ${dateText} ${timeText}` : "-";
-    line1Content = padText(line1Content);
-    
-    const line1 = document.createElement("p");
-    line1.className = "text-zinc-400 text-sm leading-5";
-    line1.textContent = line1Content;
-    bookingContainer.appendChild(line1);
+  // Zeile 1: Tag + Datum + Uhrzeit
+  const line1 = document.createElement("p");
+  line1.className = "text-zinc-400 text-sm leading-5 whitespace-pre";
 
-    // Zeile 2: Person oder unsichtbare Zeichen
-    const line2 = document.createElement("p");
-    
-    // Abstand zwischen Buchungen
-    line2.className =
-      "text-zinc-400 text-sm leading-5 pl-2.5" + 
-      ((mode === "location" && isLastBooking) ? "" : " mb-4");
-    
-    if (b.person) {
-      line2.textContent = padText(b.person);
-    } else {
-      line2.innerHTML = "&nbsp;".repeat(MAX_CHARS);
-    }
-    
-    bookingContainer.appendChild(line2);
-  });
+  if (b && b.date) {
+    const weekday = formatWeekday(b.date);
+    const date = formatGermanDate(b.date);
+    const timeText = b.start && b.end ? `von ${b.start} bis ${b.end} Uhr` : "";
+    line1.textContent = `${weekday}: ${date} ${timeText}`;
+    line1.textContent = padText(line1.textContent); // optional auffüllen
+  } else {
+    // Platzhalter mit invisible Span (Option 3)
+    line1.innerHTML = `<span class="invisible">-#########################################</span>`;
+  }
+
+  bookingContainer.appendChild(line1);
+
+  // Zeile 2: Person
+  const line2 = document.createElement("p");
+  line2.className =
+    "text-zinc-400 text-sm leading-5 whitespace-pre pl-2" +
+    (isLast ? "" : " mb-4");
+
+  if (b && b.person) {
+    line2.textContent = padText(b.person);
+  } else {
+    // unsichtbare 39 Zeichen
+    line2.innerHTML = `<span class="invisible">#########################################</span>`;
+  }
+
+  bookingContainer.appendChild(line2);
+});
+
 }
 
 // === LOAD DATA ===
@@ -1453,6 +1456,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
