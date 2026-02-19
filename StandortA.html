@@ -1403,31 +1403,37 @@ function renderRoom(room, mode = "location") {
     else hoverDiv.classList.add("bg-green-400/50");
   }
 
- // Immer 2 Buchungsblöcke für Grid
-while (relevantBookings.length < 2) {
-  relevantBookings.push(null);
-}
+ const MAX_BOOKINGS = 2;
+
+// Filtere nur ab heute
+let relevantBookings = (room.bookings || []).filter(isTodayOrFuture)
+  .sort((a,b) => new Date(a.date) - new Date(b.date))
+  .slice(0, MAX_BOOKINGS);
+
+// Immer auf 2 Buchungen auffüllen
+while (relevantBookings.length < MAX_BOOKINGS) relevantBookings.push(null);
 
 relevantBookings.forEach((b, idx) => {
-  const isLast = idx === 1; // max 2 Buchungen, idx 0 oder 1
+  const isLast = idx === MAX_BOOKINGS - 1;
 
-  // Zeile 1: Tag + Datum + Uhrzeit
+  // --- Zeile 1 ---
   const line1 = document.createElement("p");
   line1.className = "text-zinc-400 text-sm leading-5 whitespace-pre";
 
-  if (b && b.date) {
+  if (b) {
+    // echte Buchung vorhanden
     const weekday = formatWeekday(b.date);
     const date = formatGermanDate(b.date);
-    const timeText = b.start && b.end ? `von ${b.start} bis ${b.end} Uhr` : "";
+    const timeText = (b.start && b.end) ? `von ${b.start} bis ${b.end} Uhr` : "";
     line1.textContent = padText(`${weekday}: ${date} ${timeText}`);
   } else {
     // Platzhalter: sichtbares "-" + Rest invisible
-    line1.innerHTML = `- Keine Belegung -<span class="invisible">#####################</span>`;
+    line1.innerHTML = `-<span class="invisible">####################</span>`;
   }
 
   bookingContainer.appendChild(line1);
 
-  // Zeile 2: Person
+  // --- Zeile 2 ---
   const line2 = document.createElement("p");
   line2.className =
     "text-zinc-400 text-sm leading-5 whitespace-pre pl-2" +
@@ -1436,8 +1442,7 @@ relevantBookings.forEach((b, idx) => {
   if (b && b.person) {
     line2.textContent = padText(b.person);
   } else {
-    // Zeile 2 komplett invisible
-    line2.innerHTML = `<span class="invisible">#####################</span>`;
+    line2.innerHTML = `<span class="invisible">####################</span>`;
   }
 
   bookingContainer.appendChild(line2);
@@ -1459,6 +1464,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
