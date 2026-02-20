@@ -1475,7 +1475,7 @@ function renderRoom(room, mode = "location") {
       const dateText = formatGermanDate(b.date);
       const timeText = (b.start && b.end) ? `von ${b.start} bis ${b.end} Uhr` : "";
 
-      line1.textContent = padText(`- ${dayText}: ${dateText} ${timeText}`);
+      line1.textContent = padText(`${dayText}: ${dateText} ${timeText}`);
     } else {
       line1.innerHTML = `- Keine Belegung -<span class="invisible">######################</span>`;
     }
@@ -1516,6 +1516,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
