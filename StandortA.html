@@ -1467,29 +1467,36 @@ function renderRoom(room, mode = "location") {
     const isLast = idx === MAX_BOOKINGS - 1;
 
     // ---- ZEILE 1 ----
-     const line1Wrapper = document.createElement("div");
-    line1Wrapper.className = "flex justify-between items-center";
+     cconst line1 = document.createElement("p");
+line1.className = "text-zinc-400 text-sm leading-5 whitespace-pre";
 
-    const line1Text = document.createElement("p");
-    line1Text.className = "text-zinc-400 text-sm leading-5 whitespace-nowrap overflow-hidden text-ellipsis flex-1";
+if (b) {
+  const dayText = formatDay(b.date);
+  const dateText = b.date ? formatGermanDate(b.date) : "";
 
-    if (b){
-      const dayText = formatDay(b.date);
-      const dateText = b.date ? formatGermanDate(b.date) : "";
+  let longTime = (b.start && b.end)
+    ? `von ${b.start} bis ${b.end} Uhr`
+    : "";
 
-      let longTime = (b.start && b.end) ? `von ${b.start} bis ${b.end} Uhr` : "";
-      let shortTime = (b.start && b.end) ? `> ${b.start} - ${b.end} Uhr` : "";
+  let shortTime = (b.start && b.end)
+    ? `> ${b.start} - ${b.end} Uhr`
+    : "";
 
-      let lineText = `- ${dayText}: ${dateText} ${longTime}`;
-      if (lineText.length > 41) lineText = `- ${dayText}: ${dateText} ${shortTime}`;
+  // 🔹 Erst lange Version
+  let lineText = `- ${dayText}: ${dateText} ${longTime}`;
 
-      line1Text.textContent = lineText;
-    } else {
-      line1.innerHTML =
-        `- Keine Belegung -<span class="invisible">${"#".repeat(23)}</span>`;
-    }
-    
-    bookingContainer.appendChild(line1);
+  // 🔹 Wenn zu lang → kurze Version
+  if (lineText.length > MAX_CHARS) {
+    lineText = `- ${dayText}: ${dateText} ${shortTime}`;
+  }
+
+  line1.textContent = padText(lineText);
+} else {
+  line1.innerHTML =
+    `- Keine Belegung -<span class="invisible">${"#".repeat(MAX_CHARS - 18)}</span>`;
+}
+
+bookingContainer.appendChild(line1);
 
     // ---- ZEILE 2 ----
     const line2 = document.createElement("p");
@@ -1525,6 +1532,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
