@@ -1467,36 +1467,36 @@ function renderRoom(room, mode = "location") {
     const isLast = idx === MAX_BOOKINGS - 1;
 
     // ---- ZEILE 1 ----
-     cconst line1 = document.createElement("p");
-line1.className = "text-zinc-400 text-sm leading-5 whitespace-pre";
-
-if (b) {
-  const dayText = formatDay(b.date);
-  const dateText = b.date ? formatGermanDate(b.date) : "";
-
-  let longTime = (b.start && b.end)
-    ? `von ${b.start} bis ${b.end} Uhr`
-    : "";
-
-  let shortTime = (b.start && b.end)
-    ? `> ${b.start} - ${b.end} Uhr`
-    : "";
-
-  // 🔹 Erst lange Version
-  let lineText = `- ${dayText}: ${dateText} ${longTime}`;
-
-  // 🔹 Wenn zu lang → kurze Version
-  if (lineText.length > MAX_CHARS) {
-    lineText = `- ${dayText}: ${dateText} ${shortTime}`;
+  cconst line1 = document.createElement("p");
+  line1.className = "text-zinc-400 text-sm leading-5 whitespace-pre";
+  
+  if (b) {
+    const dayText = formatDay(b.date);
+    const dateText = b.date ? formatGermanDate(b.date) : "";
+  
+    let longTime = (b.start && b.end)
+      ? `von ${b.start} bis ${b.end} Uhr`
+      : "";
+  
+    let shortTime = (b.start && b.end)
+      ? `> ${b.start} - ${b.end} Uhr`
+      : "";
+  
+    // 🔹 Erst lange Version
+    let lineText = `- ${dayText}: ${dateText} ${longTime}`;
+  
+    // 🔹 Wenn zu lang → kurze Version
+    if (lineText.length > MAX_CHARS) {
+      lineText = `- ${dayText}: ${dateText} ${shortTime}`;
+    }
+  
+    line1.textContent = padText(lineText);
+  } else {
+    line1.innerHTML =
+      `- Keine Belegung -<span class="invisible">${"#".repeat(MAX_CHARS - 18)}</span>`;
   }
-
-  line1.textContent = padText(lineText);
-} else {
-  line1.innerHTML =
-    `- Keine Belegung -<span class="invisible">${"#".repeat(MAX_CHARS - 18)}</span>`;
-}
-
-bookingContainer.appendChild(line1);
+  
+  bookingContainer.appendChild(line1);
 
     // ---- ZEILE 2 ----
     const line2 = document.createElement("p");
@@ -1532,6 +1532,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
