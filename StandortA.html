@@ -1466,21 +1466,42 @@ function renderRoom(room, mode = "location") {
   relevantBookings.forEach((b, idx) => {
     const isLast = idx === MAX_BOOKINGS - 1;
 
+   
     // ---- ZEILE 1 ----
-    const line1 = document.createElement("p");
-    line1.className = "text-zinc-400 text-sm leading-5 whitespace-pre";
-
-    if (b) {
-      const dayText = formatDay(b.date);
-      const dateText = formatGermanDate(b.date);
-      const timeText = (b.start && b.end) ? `von ${b.start} bis ${b.end} Uhr` : "";
-
-      line1.textContent = padText(`- ${dayText}: ${dateText} ${timeText}`);
-    } else {
-      line1.innerHTML = `- Keine Belegung -<span class="invisible">######################</span>`;
+  const line1Wrapper = document.createElement("div");
+  line1Wrapper.className = "flex justify-between items-center";
+  
+  // Text
+  const line1Text = document.createElement("p");
+  line1Text.className = "text-zinc-400 text-sm leading-5 whitespace-nowrap overflow-hidden flex-1";
+  
+  // Status-Placeholder rechts
+  const spacer = document.createElement("span");
+  spacer.className = "shrink-0 invisible"; // reserviert Platz für Status
+  
+  if (b) {
+    const dayText = formatDay(b.date);
+    const dateText = formatGermanDate(b.date);
+    const longTime = (b.start && b.end) ? `von ${b.start} bis ${b.end} Uhr` : "";
+    const shortTime = (b.start && b.end) ? `> ${b.start} - ${b.end} Uhr` : "";
+  
+    let lineText = `- ${dayText}: ${dateText} ${longTime}`;
+  
+    // Kürzen nur, wenn Text länger als die maximal sichtbare Breite (Zeichen)
+    if (lineText.length > 41) {
+      lineText = `- ${dayText}: ${dateText} ${shortTime}`;
     }
-
-    bookingContainer.appendChild(line1);
+  
+    line1Text.textContent = lineText;
+  } else {
+    const visibleText = "- Keine Belegung -";
+    line1Text.innerHTML = `${visibleText}<span class="invisible">${"#".repeat(23 - visibleText.length)}</span>`;
+  }
+  
+  // Zusammenfügen
+  line1Wrapper.appendChild(line1Text);
+  line1Wrapper.appendChild(spacer);
+  bookingContainer.appendChild(line1Wrapper);
 
     // ---- ZEILE 2 ----
     const line2 = document.createElement("p");
@@ -1516,6 +1537,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
