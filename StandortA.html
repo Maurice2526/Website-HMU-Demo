@@ -1124,9 +1124,23 @@ document.addEventListener("DOMContentLoaded", () => {
         clone.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
 
         const glow = clone.querySelector("div.absolute");
+
         if (glow) {
+        
+          // Hover entfernen
           glow.classList.remove("opacity-0", "group-hover:opacity-100");
-          glow.classList.add("opacity-80");
+        
+          // Inset entfernen (das ist der Übeltäter)
+          glow.classList.remove("-inset-0.5");
+        
+          // Glow exakt an Card anlegen
+          glow.classList.add("inset-0");
+        
+          // etwas softer machen
+          glow.classList.add("opacity-40");
+        
+          // Hover deaktivieren
+          clone.classList.remove("group");
         }
 
         roomDetail.appendChild(clone);
@@ -1149,9 +1163,23 @@ document.addEventListener("DOMContentLoaded", () => {
       clone.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
 
       const glow = clone.querySelector("div.absolute");
+
       if (glow) {
+      
+        // Hover entfernen
         glow.classList.remove("opacity-0", "group-hover:opacity-100");
-        glow.classList.add("opacity-80");
+      
+        // Inset entfernen (das ist der Übeltäter)
+        glow.classList.remove("-inset-0.5");
+      
+        // Glow exakt an Card anlegen
+        glow.classList.add("inset-0");
+      
+        // etwas softer machen
+        glow.classList.add("opacity-40");
+      
+        // Hover deaktivieren
+        clone.classList.remove("group");
       }
 
       roomDetail.appendChild(clone);
@@ -1527,6 +1555,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
