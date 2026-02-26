@@ -1477,19 +1477,16 @@ function renderRoom(room, mode = "location") {
       const timeText = (b.start && b.end) ? `-> ${b.start} - ${b.end} Uhr` : "";
     
       const visibleText = `- ${dayText}: ${dateText} ${timeText}`;
+      const fillLength = Math.max(0, MAX_CHARS - visibleText.length); // volle Breite bei Buchung
     
-      // Länge berechnen
-      const fillLength = Math.max(0, MAX_CHARS - visibleText.length);
-    
-      line1.innerHTML =
-        `${visibleText}<span class="invisible">${"#".repeat(fillLength)}</span>`;
+      line1.innerHTML = `${visibleText}<span class="invisible">${"#".repeat(fillLength)}</span>`;
     
     } else {
       const visibleText = "- Keine Belegung -";
-      const fillLength = Math.max(0, MAX_CHARS - visibleText.length);
+      const FILL_NO_BOOKING = 32; // nur bis 32 Zeichen auffüllen
+      const fillLength = Math.max(0, FILL_NO_BOOKING - visibleText.length);
     
-      line1.innerHTML =
-        `${visibleText}<span class="invisible">${"#".repeat(fillLength)}</span>`;
+      line1.innerHTML = `${visibleText}<span class="invisible">${"#".repeat(fillLength)}</span>`;
     }
     
     bookingContainer.appendChild(line1);
@@ -1530,6 +1527,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
