@@ -1126,11 +1126,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const glow = clone.querySelector("div.absolute");
         if (glow) {
           glow.classList.remove("opacity-0", "group-hover:opacity-100");
-          glow.classList.add("opacity-50");
+          glow.classList.add("opacity-80");
         
           // 🔹 Glow an die neue Größe der Karte anpassen
-          glow.style.width = "100%";
-          glow.style.height = "100%";
+          const rect = clone.getBoundingClientRect();
+          glow.style.width = rect.width + "px";
+          glow.style.height = rect.height + "px";
           glow.style.top = "0";
           glow.style.left = "0";
         
@@ -1160,13 +1161,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const glow = clone.querySelector("div.absolute");
       if (glow) {
         glow.classList.remove("opacity-0", "group-hover:opacity-100");
-        glow.classList.add("opacity-50");
+        glow.classList.add("opacity-80");
       
-        // 🔹 Glow an die neue Größe der Karte anpassen
-        glow.style.width = "100%";
-        glow.style.height = "100%";
+        // Größe dynamisch aus der aktuellen Karte ermitteln
+        const rect = clone.getBoundingClientRect();
+        glow.style.width = rect.width + "px";
+        glow.style.height = rect.height + "px";
         glow.style.top = "0";
         glow.style.left = "0";
+
       
         // Optional: Hover in Einzelansicht deaktivieren
         clone.classList.remove("group");
@@ -1545,6 +1548,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
