@@ -1503,6 +1503,9 @@ function renderRoom(room, mode = "location") {
     
     if (b && b.person) {
       line2.textContent = b.person;
+    } else {
+      // unsichtbares Zeichen, damit die Zeile existiert
+      line2.innerHTML = `<span class="invisible">#</span>`;
     }
     
     bookingContainer.appendChild(line2);
@@ -1527,6 +1530,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
