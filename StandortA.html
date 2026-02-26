@@ -1105,82 +1105,64 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /*EINZELANSICHT*/
   function showCard(card, delay = 300) {
+  history.replaceState(null, "", "#" + card.id);
 
-    history.replaceState(null, "", "#" + card.id);
+  const switchingOnly =
+    roomList.classList.contains("hidden") &&
+    roomDetail.children.length > 0;
 
-    const switchingOnly =
-      roomList.classList.contains("hidden") &&
-      roomDetail.children.length > 0;
-
-    // 🔹 Einzelansicht → nur Karte wechseln
-    if (switchingOnly) {
-      roomDetail.classList.add("fade-out");
-
-      setTimeout(() => {
-        roomDetail.classList.remove("fade-out");
-        roomDetail.innerHTML = "";
-
-        const clone = card.cloneNode(true);
-        clone.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
-
-        const glow = clone.querySelector("div.absolute");
-        if (glow) {
-          glow.classList.remove("opacity-0", "group-hover:opacity-100");
-          glow.classList.add("opacity-80");
-        
-          // 🔹 Glow an die neue Größe der Karte anpassen
-          const rect = clone.getBoundingClientRect();
-          glow.style.width = rect.width + "px";
-          glow.style.height = rect.height + "px";
-          glow.style.top = "0";
-          glow.style.left = "0";
-        
-          // Optional: Hover in Einzelansicht deaktivieren
-          clone.classList.remove("group");
-        }
-
-        roomDetail.appendChild(clone);
-        roomDetail.classList.add("fade-in");
-        setTimeout(() => roomDetail.classList.remove("fade-in"), 300);
-      }, 300);
-      return;
-    }
-
-    // 🔹 Grid → Einzelansicht
-    roomList.classList.add("fade-out");
+  // 🔹 Einzelansicht → nur Karte wechseln
+  if (switchingOnly) {
+    roomDetail.classList.add("fade-out");
 
     setTimeout(() => {
-      roomList.classList.add("hidden");
-      roomList.classList.remove("fade-out");
-
+      roomDetail.classList.remove("fade-out");
       roomDetail.innerHTML = "";
 
       const clone = card.cloneNode(true);
       clone.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
 
+      // Glow korrekt setzen
       const glow = clone.querySelector("div.absolute");
       if (glow) {
         glow.classList.remove("opacity-0", "group-hover:opacity-100");
-        glow.classList.add("opacity-80");
-      
-        // Größe dynamisch aus der aktuellen Karte ermitteln
-        const rect = clone.getBoundingClientRect();
-        glow.style.width = rect.width + "px";
-        glow.style.height = rect.height + "px";
-        glow.style.top = "0";
-        glow.style.left = "0";
-
-      
-        // Optional: Hover in Einzelansicht deaktivieren
-        clone.classList.remove("group");
+        glow.classList.add("opacity-80", "inset-0"); // füllt Karte exakt aus
+        clone.classList.remove("group"); // Hover deaktivieren
       }
 
       roomDetail.appendChild(clone);
-      roomDetail.classList.remove("hidden");
       roomDetail.classList.add("fade-in");
       setTimeout(() => roomDetail.classList.remove("fade-in"), 300);
-    }, delay);
+    }, 300);
+    return;
   }
+
+  // 🔹 Grid → Einzelansicht
+  roomList.classList.add("fade-out");
+
+  setTimeout(() => {
+    roomList.classList.add("hidden");
+    roomList.classList.remove("fade-out");
+
+    roomDetail.innerHTML = "";
+
+    const clone = card.cloneNode(true);
+    clone.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
+
+    // Glow korrekt setzen
+    const glow = clone.querySelector("div.absolute");
+    if (glow) {
+      glow.classList.remove("opacity-0", "group-hover:opacity-100");
+      glow.classList.add("opacity-80", "inset-0"); // füllt Karte exakt aus
+      clone.classList.remove("group"); // Hover deaktivieren
+    }
+
+    roomDetail.appendChild(clone);
+    roomDetail.classList.remove("hidden");
+    roomDetail.classList.add("fade-in");
+    setTimeout(() => roomDetail.classList.remove("fade-in"), 300);
+  }, delay);
+}
 
 /*CARD CLICK*/
   cards.forEach(card => {
@@ -1548,6 +1530,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
