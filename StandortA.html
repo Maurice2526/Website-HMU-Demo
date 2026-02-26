@@ -1480,7 +1480,7 @@ function renderRoom(room, mode = "location") {
     
     } else {
       const visibleText = "- Keine Belegung -";
-      line1.innerHTML = `${visibleText}<span class="invisible">${"#".repeat(MAX_CHARS - visibleText.length)}</span>`;
+      line1.innerHTML = `${visibleText}<span class="invisible">${"#".repeat(21 - visibleText.length)}</span>`;
     }
     
     bookingContainer.appendChild(line1);
@@ -1520,6 +1520,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
