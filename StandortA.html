@@ -1106,77 +1106,60 @@ document.addEventListener("DOMContentLoaded", () => {
 /*EINZELANSICHT*/
  function showCard(card, delay = 300) {
 
-  history.replaceState(null, "", "#" + card.id);
+    history.replaceState(null, "", "#" + card.id);
 
-  const switchingOnly =
-    roomList.classList.contains("hidden") &&
-    roomDetail.children.length > 0;
+    const switchingOnly =
+      roomList.classList.contains("hidden") &&
+      roomDetail.children.length > 0;
 
-  function buildDetailCard() {
+    // 🔹 Einzelansicht → nur Karte wechseln
+    if (switchingOnly) {
+      roomDetail.classList.add("fade-out");
 
-    const clone = card.cloneNode(true);
+      setTimeout(() => {
+        roomDetail.classList.remove("fade-out");
+        roomDetail.innerHTML = "";
 
-    // Layout für Detailansicht
-    clone.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
+        const clone = card.cloneNode(true);
+        clone.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
 
-    // 🔥 ALTEN GLOW KOMPLETT ENTFERNEN
-    const oldGlow = clone.querySelector("div.absolute");
-    if (oldGlow) oldGlow.remove();
+        const glow = clone.querySelector("div.absolute");
+        if (glow) {
+          glow.classList.remove("opacity-0", "group-hover:opacity-100");
+          glow.classList.add("opacity-80");
+        }
 
-    // 🔥 NEUEN GLOW ERSTELLEN
-    const newGlow = document.createElement("div");
-    newGlow.className =
-      "absolute rounded-2xl blur-xl bg-green-400/50";
+        roomDetail.appendChild(clone);
+        roomDetail.classList.add("fade-in");
+        setTimeout(() => roomDetail.classList.remove("fade-in"), 300);
+      }, 300);
+      return;
+    }
 
-    clone.prepend(newGlow);
-
-    // Wichtig: clone muss relative bleiben
-    clone.classList.add("relative");
-
-    roomDetail.appendChild(clone);
-
-    // 🔥 GLOW EXAKT AN AKTUELLE GRÖSSE ANPASSEN
-    requestAnimationFrame(() => {
-      const rect = clone.getBoundingClientRect();
-
-      newGlow.style.width = rect.width + "px";
-      newGlow.style.height = rect.height + "px";
-      newGlow.style.top = "0";
-      newGlow.style.left = "0";
-    });
-  }
-
-  // 🔹 Einzelansicht → nur Karte wechseln
-  if (switchingOnly) {
-    roomDetail.classList.add("fade-out");
+    // 🔹 Grid → Einzelansicht
+    roomList.classList.add("fade-out");
 
     setTimeout(() => {
-      roomDetail.classList.remove("fade-out");
+      roomList.classList.add("hidden");
+      roomList.classList.remove("fade-out");
+
       roomDetail.innerHTML = "";
-      buildDetailCard();
+
+      const clone = card.cloneNode(true);
+      clone.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
+
+      const glow = clone.querySelector("div.absolute");
+      if (glow) {
+        glow.classList.remove("opacity-0", "group-hover:opacity-100");
+        glow.classList.add("opacity-80");
+      }
+
+      roomDetail.appendChild(clone);
+      roomDetail.classList.remove("hidden");
       roomDetail.classList.add("fade-in");
       setTimeout(() => roomDetail.classList.remove("fade-in"), 300);
-    }, 300);
-
-    return;
+    }, delay);
   }
-
-  // 🔹 Grid → Einzelansicht
-  roomList.classList.add("fade-out");
-
-  setTimeout(() => {
-    roomList.classList.add("hidden");
-    roomList.classList.remove("fade-out");
-
-    roomDetail.innerHTML = "";
-    buildDetailCard();
-
-    roomDetail.classList.remove("hidden");
-    roomDetail.classList.add("fade-in");
-    setTimeout(() => roomDetail.classList.remove("fade-in"), 300);
-
-  }, delay);
-}
 
 /*CARD CLICK*/
   cards.forEach(card => {
@@ -1544,6 +1527,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
