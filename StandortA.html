@@ -1468,50 +1468,22 @@ function renderRoom(room, mode = "location") {
 
    
     // ---- ZEILE 1 ----
-  // ---- ZEILE 1 (Pixel-genau kürzen) ----
-const line1Wrapper = document.createElement("div");
-line1Wrapper.className = "flex justify-between items-center";
+    const line1 = document.createElement("p");
+    line1.className = "text-zinc-400 text-sm leading-5 whitespace-pre";
 
-// Text links
-const line1Text = document.createElement("p");
-line1Text.className = "text-zinc-400 text-sm leading-5 whitespace-nowrap overflow-hidden flex-1";
+    if (b) {
+      const dayText = formatDay(b.date);
+      const dateText = formatGermanDate(b.date);
+      const timeText = (b.start && b.end) ? `von ${b.start} bis ${b.end} Uhr` : "";
 
-// Spacer für Status rechts (Platz reservieren)
-const statusWidth = 60; // px, ca. Breite der Statusanzeige
-const spacer = document.createElement("span");
-spacer.className = "shrink-0 invisible";
-spacer.style.width = `${statusWidth}px`;
+      line1.textContent = padText(`- ${dayText}: ${dateText} ${timeText}`);
+    } else {
+      const visibleText = "- Keine Belegung -";
+      line1Text.innerHTML = `${visibleText}<span class="invisible">${"#".repeat(23 - visibleText.length)}</span>`;
+    }
 
-if (b) {
-  const dayText = formatDay(b.date);
-  const dateText = formatGermanDate(b.date);
-  const longTime = (b.start && b.end) ? `von ${b.start} bis ${b.end} Uhr` : "";
-  const shortTime = (b.start && b.end) ? `> ${b.start} - ${b.end} Uhr` : "";
+    bookingContainer.appendChild(line1);
 
-  // Voller Text
-  let fullText = `- ${dayText}: ${dateText} ${longTime}`;
-  line1Text.textContent = fullText;
-
-  // Temporär in DOM hängen, um Pixelbreite zu messen
-  line1Wrapper.appendChild(line1Text);
-  line1Wrapper.appendChild(spacer);
-  bookingContainer.appendChild(line1Wrapper);
-
-  const containerWidth = bookingContainer.offsetWidth - statusWidth;
-
-  // Wenn Text breiter als Container → kurze Version verwenden
-  if (line1Text.offsetWidth > containerWidth) {
-    line1Text.textContent = `- ${dayText}: ${dateText} ${shortTime}`;
-  }
-
-} else {
-  // Platzhalter für keine Buchung
-  const visibleText = "- Keine Belegung -";
-  line1Text.innerHTML = `${visibleText}<span class="invisible">${"#".repeat(23 - visibleText.length)}</span>`;
-  line1Wrapper.appendChild(line1Text);
-  line1Wrapper.appendChild(spacer);
-  bookingContainer.appendChild(line1Wrapper);
-}
 
     // ---- ZEILE 2 ----
     const line2 = document.createElement("p");
@@ -1547,6 +1519,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
