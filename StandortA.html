@@ -1474,7 +1474,7 @@ function renderRoom(room, mode = "location") {
     if (b) {
       const dayText = formatDay(b.date);
       const dateText = formatGermanDate(b.date);
-      const timeText = (b.start && b.end) ? `von ${b.start} - ${b.end} Uhr` : "";
+      const timeText = (b.start && b.end) ? `-> ${b.start} - ${b.end} Uhr` : "";
     
       line1.textContent = padText(`- ${dayText}: ${dateText} ${timeText}`);
     
@@ -1520,6 +1520,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
