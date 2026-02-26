@@ -1504,14 +1504,14 @@ function renderRoom(room, mode = "location") {
     if (b && b.person) {
     
       const visibleText = b.person;
-      const fillLength = Math.max(0, MAX_CHARS - visibleText.length);
+      const fillLength = Math.max(0, 5 - visibleText.length);
     
       line2.innerHTML =
         `${visibleText}<span class="invisible">${"#".repeat(fillLength)}</span>`;
     
     } else {
     
-      const fillLength = MAX_CHARS;
+      const fillLength = 5;
     
       line2.innerHTML =
         `<span class="invisible">${"#".repeat(fillLength)}</span>`;
@@ -1539,6 +1539,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
