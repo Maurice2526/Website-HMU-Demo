@@ -1105,11 +1105,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /*EINZELANSICHT*/
  function showCard(card, delay = 300) {
+
   history.replaceState(null, "", "#" + card.id);
 
   const switchingOnly =
     roomList.classList.contains("hidden") &&
     roomDetail.children.length > 0;
+
+  function buildDetailCard() {
+
+    const clone = card.cloneNode(true);
+
+    // Layout für Detailansicht
+    clone.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
+
+    // 🔥 ALTEN GLOW KOMPLETT ENTFERNEN
+    const oldGlow = clone.querySelector("div.absolute");
+    if (oldGlow) oldGlow.remove();
+
+    // 🔥 NEUEN GLOW ERSTELLEN
+    const newGlow = document.createElement("div");
+    newGlow.className =
+      "absolute rounded-2xl blur-xl bg-green-400/50";
+
+    clone.prepend(newGlow);
+
+    // Wichtig: clone muss relative bleiben
+    clone.classList.add("relative");
+
+    roomDetail.appendChild(clone);
+
+    // 🔥 GLOW EXAKT AN AKTUELLE GRÖSSE ANPASSEN
+    requestAnimationFrame(() => {
+      const rect = clone.getBoundingClientRect();
+
+      newGlow.style.width = rect.width + "px";
+      newGlow.style.height = rect.height + "px";
+      newGlow.style.top = "0";
+      newGlow.style.left = "0";
+    });
+  }
 
   // 🔹 Einzelansicht → nur Karte wechseln
   if (switchingOnly) {
@@ -1118,21 +1153,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       roomDetail.classList.remove("fade-out");
       roomDetail.innerHTML = "";
-
-      const clone = card.cloneNode(true);
-      clone.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
-
-      // Glow neu setzen
-      const oldGlow = clone.querySelector("div.absolute");
-      if (oldGlow) {
-        // Alte Klassen entfernen
-        oldGlow.className = "absolute -inset-0.5 rounded-2xl bg-green-400/50 blur-xl opacity-50 transition";
-      }
-
-      // Hover in Einzelansicht deaktivieren
-      clone.classList.remove("group");
-
-      roomDetail.appendChild(clone);
+      buildDetailCard();
       roomDetail.classList.add("fade-in");
       setTimeout(() => roomDetail.classList.remove("fade-in"), 300);
     }, 300);
@@ -1148,23 +1169,12 @@ document.addEventListener("DOMContentLoaded", () => {
     roomList.classList.remove("fade-out");
 
     roomDetail.innerHTML = "";
+    buildDetailCard();
 
-    const clone = card.cloneNode(true);
-    clone.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
-
-    // Glow neu setzen
-    const oldGlow = clone.querySelector("div.absolute");
-    if (oldGlow) {
-      oldGlow.className = "absolute -inset-0.5 rounded-2xl bg-green-400/50 blur-xl opacity-50 transition";
-    }
-
-    // Hover in Einzelansicht deaktivieren
-    clone.classList.remove("group");
-
-    roomDetail.appendChild(clone);
     roomDetail.classList.remove("hidden");
     roomDetail.classList.add("fade-in");
     setTimeout(() => roomDetail.classList.remove("fade-in"), 300);
+
   }, delay);
 }
 
@@ -1534,6 +1544,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
