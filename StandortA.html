@@ -1470,18 +1470,21 @@ function renderRoom(room, mode = "location") {
     // ---- ZEILE 1 ----
     const line1 = document.createElement("p");
     line1.className = "text-zinc-400 text-sm leading-5 whitespace-pre";
-
+    
     if (b) {
       const dayText = formatDay(b.date);
       const dateText = formatGermanDate(b.date);
-      const timeText = (b.start && b.end) ? `von ${b.start} - ${b.end} Uhr` : "";
-
+      const timeText = (b.start && b.end)
+        ? `von ${b.start} - ${b.end} Uhr`
+        : "";
+    
       line1.textContent = padText(`- ${dayText}: ${dateText} ${timeText}`);
+    
     } else {
       const visibleText = "- Keine Belegung -";
-      line1Text.innerHTML = `${visibleText}<span class="invisible">${"#".repeat(21 - visibleText.length)}</span>`;
+      line1.innerHTML = `${visibleText}<span class="invisible">${"#".repeat(MAX_CHARS - visibleText.length)}</span>`;
     }
-
+    
     bookingContainer.appendChild(line1);
 
 
@@ -1519,6 +1522,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
