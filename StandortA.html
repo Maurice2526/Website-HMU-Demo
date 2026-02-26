@@ -1472,28 +1472,27 @@ function renderRoom(room, mode = "location") {
     line1.className = "text-zinc-400 text-sm leading-5 whitespace-pre";
     
     if (b) {
+      // Echte Belegung
       const dayText = formatDay(b.date);
       const dateText = formatGermanDate(b.date);
       const timeText = (b.start && b.end) ? `-> ${b.start} - ${b.end} Uhr` : "";
     
       const visibleText = `- ${dayText}: ${dateText} ${timeText}`;
-    
-      // Länge berechnen
       const fillLength = Math.max(0, MAX_CHARS - visibleText.length);
     
-      line1.innerHTML =
-        `${visibleText}<span class="invisible">${"#".repeat(fillLength)}</span>`;
+      // Linie immer bis MAX_CHARS auffüllen
+      line1.innerHTML = `${visibleText}<span class="invisible">${"#".repeat(fillLength)}</span>`;
     
     } else {
-      const visibleText = "- Keine Belegung -";
-      const fillLength = Math.max(0, MAX_CHARS - visibleText.length);
-    
-      line1.innerHTML =
-        `${visibleText}<span class="invisible">${"#".repeat(fillLength)}</span>`;
+      // Platzhalter, exakt gleiche Höhe wie echte Belegung
+      const placeholderText = "- Keine Belegung -";
+      // Füllung so berechnen, dass die Gesamtbreite wie bei MAX_CHARS ist
+      const fillLength = MAX_CHARS - placeholderText.length;
+      line1.innerHTML = `${placeholderText}<span class="invisible">${"#".repeat(fillLength)}</span>`;
     }
     
     bookingContainer.appendChild(line1);
-
+    
 
   // ---- ZEILE 2 ----
     const line2 = document.createElement("p");
@@ -1530,6 +1529,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
