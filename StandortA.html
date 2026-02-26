@@ -1126,7 +1126,16 @@ document.addEventListener("DOMContentLoaded", () => {
         const glow = clone.querySelector("div.absolute");
         if (glow) {
           glow.classList.remove("opacity-0", "group-hover:opacity-100");
-          glow.classList.add("opacity-80");
+          glow.classList.add("opacity-50");
+        
+          // 🔹 Glow an die neue Größe der Karte anpassen
+          glow.style.width = "100%";
+          glow.style.height = "100%";
+          glow.style.top = "0";
+          glow.style.left = "0";
+        
+          // Optional: Hover in Einzelansicht deaktivieren
+          clone.classList.remove("group");
         }
 
         roomDetail.appendChild(clone);
@@ -1151,7 +1160,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const glow = clone.querySelector("div.absolute");
       if (glow) {
         glow.classList.remove("opacity-0", "group-hover:opacity-100");
-        glow.classList.add("opacity-80");
+        glow.classList.add("opacity-50");
+      
+        // 🔹 Glow an die neue Größe der Karte anpassen
+        glow.style.width = "100%";
+        glow.style.height = "100%";
+        glow.style.top = "0";
+        glow.style.left = "0";
+      
+        // Optional: Hover in Einzelansicht deaktivieren
+        clone.classList.remove("group");
       }
 
       roomDetail.appendChild(clone);
@@ -1527,6 +1545,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
