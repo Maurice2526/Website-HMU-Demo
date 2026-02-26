@@ -1111,7 +1111,6 @@ document.addEventListener("DOMContentLoaded", () => {
     roomList.classList.contains("hidden") &&
     roomDetail.children.length > 0;
 
-  // 🔹 Einzelansicht → nur Karte wechseln
   if (switchingOnly) {
     roomDetail.classList.add("fade-out");
 
@@ -1119,45 +1118,47 @@ document.addEventListener("DOMContentLoaded", () => {
       roomDetail.classList.remove("fade-out");
       roomDetail.innerHTML = "";
 
-      const clone = card.cloneNode(true);
-      clone.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
+      // Karte direkt verschieben statt klonen
+      const cardToShow = card;
+      roomDetail.appendChild(cardToShow);
+      cardToShow.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
 
-      // Glow korrekt setzen
-      const glow = clone.querySelector("div.absolute");
+      // Hover deaktivieren in Einzelansicht
+      cardToShow.classList.remove("group");
+
+      // Glow muss nicht angepasst werden, passt automatisch
+      const glow = cardToShow.querySelector("div.absolute");
       if (glow) {
-        glow.classList.remove("opacity-0", "group-hover:opacity-100");
-        glow.classList.add("opacity-80", "inset-0"); // füllt Karte exakt aus
-        clone.classList.remove("group"); // Hover deaktivieren
+        glow.classList.remove("group-hover:opacity-100");
+        glow.classList.add("opacity-50");
       }
 
-      roomDetail.appendChild(clone);
       roomDetail.classList.add("fade-in");
       setTimeout(() => roomDetail.classList.remove("fade-in"), 300);
     }, 300);
+
     return;
   }
 
-  // 🔹 Grid → Einzelansicht
+  // Grid → Einzelansicht
   roomList.classList.add("fade-out");
 
   setTimeout(() => {
     roomList.classList.add("hidden");
     roomList.classList.remove("fade-out");
 
+    const cardToShow = card;
     roomDetail.innerHTML = "";
+    roomDetail.appendChild(cardToShow);
+    cardToShow.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
+    cardToShow.classList.remove("group");
 
-    const clone = card.cloneNode(true);
-    clone.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
-
-    // Glow korrekt setzen
-    const glow = clone.querySelector("div.absolute");
+    const glow = cardToShow.querySelector("div.absolute");
     if (glow) {
-      glow.classList.remove("opacity-0", "group-hover:opacity-100");
-      glow.classList.add("opacity-80", "inset-0"); // füllt Karte exakt aus
-      clone.classList.remove("group"); // Hover deaktivieren
+      glow.classList.remove("group-hover:opacity-100");
+      glow.classList.add("opacity-50");
     }
 
-    roomDetail.appendChild(clone);
     roomDetail.classList.remove("hidden");
     roomDetail.classList.add("fade-in");
     setTimeout(() => roomDetail.classList.remove("fade-in"), 300);
@@ -1530,6 +1531,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
