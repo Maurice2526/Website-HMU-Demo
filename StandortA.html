@@ -1472,45 +1472,40 @@ function renderRoom(room, mode = "location") {
     line1.className = "text-zinc-400 text-sm leading-5 whitespace-pre";
     
     if (b) {
-      // Echte Belegung
       const dayText = formatDay(b.date);
       const dateText = formatGermanDate(b.date);
       const timeText = (b.start && b.end) ? `-> ${b.start} - ${b.end} Uhr` : "";
     
       const visibleText = `- ${dayText}: ${dateText} ${timeText}`;
+    
+      // Länge berechnen
       const fillLength = Math.max(0, MAX_CHARS - visibleText.length);
     
-      // Monospace-Filler für gleiche Breite
-      line1.innerHTML = `${visibleText}<span class="invisible font-mono">${"#".repeat(fillLength)}</span>`;
+      line1.innerHTML =
+        `${visibleText}<span class="invisible">${"#".repeat(fillLength)}</span>`;
+    
     } else {
-      // Keine Belegung → nur sichtbarer Text, keine Füllung
-      line1.textContent = "- Keine Belegung -";
+      const visibleText = "- Keine Belegung -";
+      const fillLength = Math.max(0, MAX_CHARS - visibleText.length);
+    
+      line1.innerHTML =
+        `${visibleText}<span class="invisible">${"#".repeat(fillLength)}</span>`;
     }
     
     bookingContainer.appendChild(line1);
-    
-    // ---- ZEILE 2 ----
+
+
+  // ---- ZEILE 2 ----
     const line2 = document.createElement("p");
+    line2.className =
+      "text-zinc-400 text-sm leading-5 whitespace-pre pl-2.5" +
+      (!isLast ? " mb-4" : "");
     
-    // Standard-Klassen
-    let line2Class = "text-zinc-400 text-sm leading-5 whitespace-pre";
-    
-    // Wenn echte Person → Einzug + optionaler margin-bottom
-    if (b && b.person) {
-      line2Class += " pl-2.5" + (!isLast ? " mb-4" : "");
-    } else {
-      // Keine Person → kein Einzug, trotzdem mb-4 falls nicht letzte Buchung
-      line2Class += !isLast ? " mb-4" : "";
-    }
-    
-    line2.className = line2Class;
-    
-    // Inhalt
     if (b && b.person) {
       line2.textContent = b.person;
     } else {
-      // Unsichtbare Füllung für Card-Höhe
-      line2.innerHTML = `<span class="invisible font-mono">${"#".repeat(MAX_CHARS)}</span>`;
+      // unsichtbares Zeichen, damit die Zeile existiert
+      line2.innerHTML = `<span class="invisible">#</span>`;
     }
     
     bookingContainer.appendChild(line2);
@@ -1535,6 +1530,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
