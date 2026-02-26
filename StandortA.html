@@ -1474,12 +1474,12 @@ function renderRoom(room, mode = "location") {
     if (b) {
       const dayText = formatDay(b.date);
       const dateText = formatGermanDate(b.date);
-      const timeText = (b.start && b.end) ? `von ${b.start} bis ${b.end} Uhr` : "";
+      const timeText = (b.start && b.end) ? `von ${b.start} - ${b.end} Uhr` : "";
 
       line1.textContent = padText(`- ${dayText}: ${dateText} ${timeText}`);
     } else {
       const visibleText = "- Keine Belegung -";
-      line1Text.innerHTML = `${visibleText}<span class="invisible">${"#".repeat(23 - visibleText.length)}</span>`;
+      line1Text.innerHTML = `${visibleText}<span class="invisible">${"#".repeat(21 - visibleText.length)}</span>`;
     }
 
     bookingContainer.appendChild(line1);
@@ -1519,6 +1519,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
