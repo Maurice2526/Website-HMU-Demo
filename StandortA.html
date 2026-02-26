@@ -1504,7 +1504,7 @@ function renderRoom(room, mode = "location") {
     if (b && b.person) {
       line2.textContent = padText(b.person);
     } else {
-      line2.innerHTML = `<span class="invisible">${"\u00A0".repeat(MAX_CHARS)}</span>`;
+      line2.innerHTML = `<span class="invisible">${"#".repeat(37)}</span>`;
     }
     
     bookingContainer.appendChild(line2);
@@ -1529,6 +1529,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
