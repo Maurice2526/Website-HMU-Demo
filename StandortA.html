@@ -1502,19 +1502,7 @@ function renderRoom(room, mode = "location") {
       (!isLast ? " mb-4" : "");
     
     if (b && b.person) {
-    
-      const visibleText = b.person;
-      const fillLength = Math.max(0, 1 - visibleText.length);
-    
-      line2.innerHTML =
-        `${visibleText}<span class="invisible">${"#".repeat(fillLength)}</span>`;
-    
-    } else {
-    
-      const fillLength = 1;
-    
-      line2.innerHTML =
-        `<span class="invisible">${"#".repeat(fillLength)}</span>`;
+      line2.textContent = b.person;
     }
     
     bookingContainer.appendChild(line2);
@@ -1539,6 +1527,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
