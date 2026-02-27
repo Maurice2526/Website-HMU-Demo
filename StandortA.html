@@ -1135,12 +1135,15 @@ document.addEventListener("DOMContentLoaded", () => {
     newCard.appendChild(glowDiv);
   
     // Größe anpassen (nach dem Anhängen)
-    setTimeout(() => {
+    roomDetail.appendChild(newCard);
+      
+    const glowDiv = newCard.querySelector("div.absolute");
+    if (glowDiv) {
       glowDiv.style.width = newCard.offsetWidth + "px";
       glowDiv.style.height = newCard.offsetHeight + "px";
       glowDiv.style.top = "0px";
       glowDiv.style.left = "0px";
-    }, 0);
+    }
   
     return newCard;
   };
@@ -1466,6 +1469,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
