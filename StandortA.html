@@ -1143,6 +1143,10 @@ function showCard(card, delay = 300) {
       glow.style.height = card.offsetHeight + "px";
       glow.style.top = "0";
       glow.style.left = "0";
+
+      // Einzelansicht: Glow immer sichtbar
+      glow.classList.remove("opacity-0", "group-hover:opacity-100");
+      glow.classList.add("opacity-80");
     }
   };
 
@@ -1576,6 +1580,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
