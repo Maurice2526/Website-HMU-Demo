@@ -1090,45 +1090,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-let activeCard = null;
-let originalParent = null;
-let originalNextSibling = null;
-
 /*ZURÜCK ZUM GRID*/
-function backToGrid() {
-  if (!activeCard) return;
+  function backToGrid() {
+    roomDetail.classList.add("fade-out");
+    setTimeout(() => {
+      roomDetail.classList.add("hidden");
+      roomDetail.classList.remove("fade-out");
 
-  roomDetail.classList.add("fade-out");
-
-  setTimeout(() => {
-    // Karte zurück an Originalposition
-    if (originalParent) {
-      if (originalNextSibling) {
-        originalParent.insertBefore(activeCard, originalNextSibling);
-      } else {
-        originalParent.appendChild(activeCard);
-      }
-    }
-
-    // Layout-Klassen wieder entfernen
-    activeCard.classList.remove("mx-auto", "max-w-md", "flex", "justify-center");
-
-    activeCard = null;
-    originalParent = null;
-    originalNextSibling = null;
-
-    roomDetail.classList.add("hidden");
-    roomDetail.classList.remove("fade-out");
-
-    roomList.classList.remove("hidden");
-    roomList.classList.add("fade-in");
-    setTimeout(() => roomList.classList.remove("fade-in"), 300);
-
-  }, 300);
-}
+      roomList.classList.remove("hidden");
+      roomList.classList.add("fade-in");
+      setTimeout(() => roomList.classList.remove("fade-in"), 300);
+    }, 300);
+  }
 
 /*EINZELANSICHT*/
-function showCard(card, delay = 300) {
+  function showCard(card, delay = 300) {
 
     history.replaceState(null, "", "#" + card.id);
 
@@ -1551,6 +1527,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
