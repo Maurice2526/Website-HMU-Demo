@@ -1102,78 +1102,79 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /*EINZELANSICHT*/
   function showCard(card, delay = 300) {
-    history.replaceState(null, "", "#" + card.id);
+  history.replaceState(null, "", "#" + card.id);
 
-    const switchingOnly =
-      roomList.classList.contains("hidden") &&
-      roomDetail.children.length > 0;
+  const switchingOnly =
+    roomList.classList.contains("hidden") &&
+    roomDetail.children.length > 0;
 
-    // Funktion: neue Einzelansicht-Card erstellen
-    const createSingleViewCard = (sourceCard) => {
-      const newCard = document.createElement("div");
-      newCard.className = "group relative room-card mx-auto max-w-md flex justify-center cursor-pointer";
+  // Funktion: neue Einzelansicht-Card erstellen
+  const createSingleViewCard = (sourceCard) => {
+    const newCard = document.createElement("div");
+    newCard.className = "group relative room-card mx-auto max-w-md flex justify-center cursor-pointer";
 
-      // Glow erstellen
-      const glowDiv = document.createElement("div");
-      glowDiv.className = "absolute -inset-0.5 rounded-2xl blur-xl opacity-80 transition";
-      
-      // Status-Farbe setzen
-      const status = getStatus(room.bookings || []);
-      const glowColor = status === "belegt" ? "bg-red-400/50" : "bg-green-400/50";
-      glowDiv.classList.add(glowColor);
+    // 🔹 Status ermitteln
+    const statusEl = sourceCard.querySelector(".room-status");
+    const status = statusEl?.textContent === "belegt" ? "belegt" : "frei";
 
-      // Inner Content kopieren
-      const inner = document.createElement("div");
-      inner.className = "relative bg-[oklch(25%_0.041_260.031)] rounded-2xl p-6 border border-white/5 shadow-lg shadow-black/50 transition-all duration-300";
+    // 🔹 Glow erstellen und Farbe nach Status setzen
+    const glowDiv = document.createElement("div");
+    glowDiv.className = "absolute -inset-0.5 rounded-2xl blur-xl opacity-80 transition";
+    glowDiv.classList.add(status === "belegt" ? "bg-red-400/50" : "bg-green-400/50");
+    newCard.appendChild(glowDiv); // 🔹 wichtig: zuerst hinzufügen, damit es hinter Content liegt
 
-      // Header kopieren
-      const header = sourceCard.querySelector("div > .flex.items-center.justify-between");
-      if (header) inner.appendChild(header.cloneNode(true));
+    // 🔹 Inner Content
+    const inner = document.createElement("div");
+    inner.className = "relative bg-[oklch(25%_0.041_260.031)] rounded-2xl p-6 border border-white/5 shadow-lg shadow-black/50 transition-all duration-300 hover:-translate-y-1";
 
-      // Booking Container kopieren
-      const booking = sourceCard.querySelector(".booking-container");
-      if (booking) inner.appendChild(booking.cloneNode(true));
+    // Header kopieren
+    const header = sourceCard.querySelector("div > .flex.items-center.justify-between");
+    if (header) inner.appendChild(header.cloneNode(true));
 
-      newCard.appendChild(inner);
+    // Booking Container kopieren
+    const booking = sourceCard.querySelector(".booking-container");
+    if (booking) inner.appendChild(booking.cloneNode(true));
 
-      // Glow an neue Card-Größe anpassen
-      requestAnimationFrame(() => {
-        glowDiv.style.width = newCard.offsetWidth + "px";
-        glowDiv.style.height = newCard.offsetHeight + "px";
-        glowDiv.style.top = "0px";
-        glowDiv.style.left = "0px";
-      });
+    newCard.appendChild(inner);
 
-      return newCard;
-    };
+    // 🔹 Glow Größe anpassen nach der neuen Card
+    requestAnimationFrame(() => {
+      glowDiv.style.width = newCard.offsetWidth + "px";
+      glowDiv.style.height = newCard.offsetHeight + "px";
+      glowDiv.style.top = "0px";
+      glowDiv.style.left = "0px";
+    });
 
-    // Einzelansicht → Karte wechseln
-    if (switchingOnly) {
-      roomDetail.classList.add("fade-out");
-      setTimeout(() => {
-        roomDetail.innerHTML = "";
-        const newCard = createSingleViewCard(card);
-        roomDetail.appendChild(newCard);
-        roomDetail.classList.remove("fade-out");
-        roomDetail.classList.add("fade-in");
-        setTimeout(() => roomDetail.classList.remove("fade-in"), 300);
-      }, 300);
-      return;
-    }
+    return newCard;
+  };
 
-    // Grid → Einzelansicht
-    roomList.classList.add("fade-out");
+  // ---------- Einzelansicht: Karte wechseln ----------
+  if (switchingOnly) {
+    roomDetail.classList.add("fade-out");
     setTimeout(() => {
-      roomList.classList.add("hidden");
-      roomList.classList.remove("fade-out");
       roomDetail.innerHTML = "";
       const newCard = createSingleViewCard(card);
       roomDetail.appendChild(newCard);
-      roomDetail.classList.remove("hidden");
+      roomDetail.classList.remove("fade-out");
       roomDetail.classList.add("fade-in");
       setTimeout(() => roomDetail.classList.remove("fade-in"), 300);
-    }, delay);
+    }, 300);
+    return;
   }
+
+  // ---------- Grid → Einzelansicht ----------
+  roomList.classList.add("fade-out");
+  setTimeout(() => {
+    roomList.classList.add("hidden");
+    roomList.classList.remove("fade-out");
+    roomDetail.innerHTML = "";
+    const newCard = createSingleViewCard(card);
+    roomDetail.appendChild(newCard);
+    roomDetail.classList.remove("hidden");
+    roomDetail.classList.add("fade-in");
+    setTimeout(() => roomDetail.classList.remove("fade-in"), 300);
+  }, delay);
+}
 
   /*CARD CLICK*/
   cards.forEach(card => {
@@ -1468,6 +1469,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
