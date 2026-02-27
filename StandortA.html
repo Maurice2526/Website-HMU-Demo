@@ -1119,7 +1119,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 🔹 Glow erstellen und Farbe nach Status setzen
     const glowDiv = document.createElement("div");
-    glowDiv.className = "absolute -inset-0.5 rounded-2xl blur-xl opacity-80 transition";
+    glowDiv.className = "absolute -inset-0.5 rounded-xl blur-xl opacity-80 transition";
     glowDiv.classList.add(status === "belegt" ? "bg-red-400/50" : "bg-green-400/50");
     newCard.appendChild(glowDiv); // 🔹 wichtig: zuerst hinzufügen, damit es hinter Content liegt
 
@@ -1469,6 +1469,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
