@@ -1115,8 +1115,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Glow erstellen
       const glowDiv = document.createElement("div");
-      glowDiv.className = "absolute -inset-0.5 rounded-2xl bg-red-400/50 blur-xl opacity-80 transition";
-      newCard.appendChild(glowDiv);
+      glowDiv.className = "absolute -inset-0.5 rounded-2xl blur-xl opacity-80 transition";
+
+      // Status-Farbe setzen
+      const status = getStatus(room.bookings || []);
+      const glowColor = status === "belegt" ? "bg-red-400/50" : "bg-green-400/50";
+      glowDiv.classList.add(glowColor);
 
       // Inner Content kopieren
       const inner = document.createElement("div");
@@ -1133,11 +1137,12 @@ document.addEventListener("DOMContentLoaded", () => {
       newCard.appendChild(inner);
 
       // Glow an neue Card-Größe anpassen
-      requestAnimationFrame(() => {
-        glowDiv.style.width = newCard.offsetWidth + "px";
-        glowDiv.style.height = newCard.offsetHeight + "px";
-        glowDiv.style.top = "0px";
-        glowDiv.style.left = "0px";
+      glowDiv.style.width = newCard.offsetWidth + "px";
+      glowDiv.style.height = newCard.offsetHeight + "px";
+      glowDiv.style.top = "0px";
+      glowDiv.style.left = "0px";
+      
+      newCard.appendChild(glowDiv);
       });
 
       return newCard;
@@ -1464,6 +1469,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
