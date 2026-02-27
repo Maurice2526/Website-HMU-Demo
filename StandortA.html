@@ -1065,13 +1065,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
   const levels = document.querySelectorAll(".level-container");
 
-/*HELPER: EBENEN MIT FADE*/
+  // HELPER: EBENEN MIT FADE
   function fadeSwitchLevels(callback) {
     roomList.classList.add("fade-out");
-
     setTimeout(() => {
       callback();
-
       roomList.classList.remove("fade-out");
       roomList.classList.add("fade-in");
       setTimeout(() => roomList.classList.remove("fade-in"), 300);
@@ -1090,78 +1088,90 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-/*ZURÜCK ZUM GRID*/
+  /*ZURÜCK ZUM GRID*/
   function backToGrid() {
     roomDetail.classList.add("fade-out");
     setTimeout(() => {
       roomDetail.classList.add("hidden");
       roomDetail.classList.remove("fade-out");
-
       roomList.classList.remove("hidden");
       roomList.classList.add("fade-in");
       setTimeout(() => roomList.classList.remove("fade-in"), 300);
     }, 300);
   }
 
-/*EINZELANSICHT*/
+  /*EINZELANSICHT*/
   function showCard(card, delay = 300) {
-
     history.replaceState(null, "", "#" + card.id);
 
     const switchingOnly =
       roomList.classList.contains("hidden") &&
       roomDetail.children.length > 0;
 
-    // 🔹 Einzelansicht → nur Karte wechseln
+    // Funktion: neue Einzelansicht-Card erstellen
+    const createSingleViewCard = (sourceCard) => {
+      const newCard = document.createElement("div");
+      newCard.className = "group relative room-card mx-auto max-w-md flex justify-center cursor-pointer";
+
+      // Glow erstellen
+      const glowDiv = document.createElement("div");
+      glowDiv.className = "absolute -inset-0.5 rounded-2xl bg-green-400/50 blur-xl opacity-80 transition";
+      newCard.appendChild(glowDiv);
+
+      // Inner Content kopieren
+      const inner = document.createElement("div");
+      inner.className = "relative bg-[oklch(25%_0.041_260.031)] rounded-2xl p-6 border border-white/5 shadow-lg shadow-black/50 transition-all duration-300";
+
+      // Header kopieren
+      const header = sourceCard.querySelector("div > .flex.items-center.justify-between");
+      if (header) inner.appendChild(header.cloneNode(true));
+
+      // Booking Container kopieren
+      const booking = sourceCard.querySelector(".booking-container");
+      if (booking) inner.appendChild(booking.cloneNode(true));
+
+      newCard.appendChild(inner);
+
+      // Glow an neue Card-Größe anpassen
+      requestAnimationFrame(() => {
+        glowDiv.style.width = newCard.offsetWidth + "px";
+        glowDiv.style.height = newCard.offsetHeight + "px";
+        glowDiv.style.top = "0px";
+        glowDiv.style.left = "0px";
+      });
+
+      return newCard;
+    };
+
+    // Einzelansicht → Karte wechseln
     if (switchingOnly) {
       roomDetail.classList.add("fade-out");
-
       setTimeout(() => {
-        roomDetail.classList.remove("fade-out");
         roomDetail.innerHTML = "";
-
-        const clone = card.cloneNode(true);
-        clone.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
-
-        const glow = clone.querySelector("div.absolute");
-        if (glow) {
-          glow.classList.remove("opacity-0", "group-hover:opacity-100");
-          glow.classList.add("opacity-80");
-        }
-
-        roomDetail.appendChild(clone);
+        const newCard = createSingleViewCard(card);
+        roomDetail.appendChild(newCard);
+        roomDetail.classList.remove("fade-out");
         roomDetail.classList.add("fade-in");
         setTimeout(() => roomDetail.classList.remove("fade-in"), 300);
       }, 300);
       return;
     }
 
-    // 🔹 Grid → Einzelansicht
+    // Grid → Einzelansicht
     roomList.classList.add("fade-out");
-
     setTimeout(() => {
       roomList.classList.add("hidden");
       roomList.classList.remove("fade-out");
-
       roomDetail.innerHTML = "";
-
-      const clone = card.cloneNode(true);
-      clone.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
-
-      const glow = clone.querySelector("div.absolute");
-      if (glow) {
-        glow.classList.remove("opacity-0", "group-hover:opacity-100");
-        glow.classList.add("opacity-80");
-      }
-
-      roomDetail.appendChild(clone);
+      const newCard = createSingleViewCard(card);
+      roomDetail.appendChild(newCard);
       roomDetail.classList.remove("hidden");
       roomDetail.classList.add("fade-in");
       setTimeout(() => roomDetail.classList.remove("fade-in"), 300);
     }, delay);
   }
 
-/*CARD CLICK*/
+  /*CARD CLICK*/
   cards.forEach(card => {
     card.addEventListener("click", () => {
       showCard(card);
@@ -1169,136 +1179,64 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-/*FILTER*/
+  /*FILTER*/
   filter.addEventListener("change", () => {
     const value = filter.value;
-
-    // 🔹 ALLE RÄUME
     if (value === "") {
       if (!roomDetail.classList.contains("hidden")) backToGrid();
-
-      fadeSwitchLevels(() => {
-        showAllLevels();
-      });
+      fadeSwitchLevels(() => showAllLevels());
       return;
     }
 
-    // 🔹 EBENEN
-    if (value === "LEVEL_1") {
+    if (value.startsWith("LEVEL_")) {
       if (!roomDetail.classList.contains("hidden")) backToGrid();
-
-      fadeSwitchLevels(() => {
-        showOnlyLevel("1");
-      });
+      fadeSwitchLevels(() => showOnlyLevel(value.split("_")[1]));
       return;
     }
 
-    if (value === "LEVEL_2") {
-      if (!roomDetail.classList.contains("hidden")) backToGrid();
-
-      fadeSwitchLevels(() => {
-        showOnlyLevel("2");
-      });
-      return;
-    }
-
-    if (value === "LEVEL_3") {
-      if (!roomDetail.classList.contains("hidden")) backToGrid();
-
-      fadeSwitchLevels(() => {
-        showOnlyLevel("3");
-      });
-      return;
-    }
-
-    if (value === "LEVEL_4") {
-      if (!roomDetail.classList.contains("hidden")) backToGrid();
-
-      fadeSwitchLevels(() => {
-        showOnlyLevel("4");
-      });
-      return;
-    }
-
-    if (value === "LEVEL_5") {
-      if (!roomDetail.classList.contains("hidden")) backToGrid();
-
-      fadeSwitchLevels(() => {
-        showOnlyLevel("5");
-      });
-      return;
-    }
-
-    // 🔹 EINZELRAUM
     const card = document.getElementById(value);
     if (card) {
       const levelContainer = card.closest(".level-container");
-      if (levelContainer) {
-        fadeSwitchLevels(() => {
-          showOnlyLevel(levelContainer.dataset.level);
-        });
-      }
+      if (levelContainer) fadeSwitchLevels(() => showOnlyLevel(levelContainer.dataset.level));
       showCard(card);
     }
   });
 
-/*ZURÜCK BUTTON*/
- backButton.addEventListener("click", e => {
-  e.preventDefault();
-
-  // 🔹 1. Einzelansicht → Grid
-  if (!roomDetail.classList.contains("hidden")) {
-    backToGrid();
-    filter.value = "";
-    showAllLevels();
-    return;
-  }
-
-  // 🔹 2. Ebene gefiltert → Alle Räume mit Fade
-  if (filter.value !== "") {
-    const visibleLevels = Array.from(levels).filter(l => !l.classList.contains("hidden"));
-
-    // fade-out der aktuell sichtbaren Ebene(n)
-    visibleLevels.forEach(l => l.classList.add("fade-out"));
-    
-    setTimeout(() => {
-      // alle Levels wieder sichtbar
-      showAllLevels();
-
-      // fade-out entfernen & fade-in hinzufügen
-      visibleLevels.forEach(l => {
-        l.classList.remove("fade-out");
-      });
-      levels.forEach(l => l.classList.add("fade-in"));
-
-      setTimeout(() => levels.forEach(l => l.classList.remove("fade-in")), 300);
-
-      // Filter zurücksetzen
+  /*ZURÜCK BUTTON*/
+  backButton.addEventListener("click", e => {
+    e.preventDefault();
+    if (!roomDetail.classList.contains("hidden")) {
+      backToGrid();
       filter.value = "";
-    }, 300);
+      showAllLevels();
+      return;
+    }
+    if (filter.value !== "") {
+      const visibleLevels = Array.from(levels).filter(l => !l.classList.contains("hidden"));
+      visibleLevels.forEach(l => l.classList.add("fade-out"));
+      setTimeout(() => {
+        showAllLevels();
+        visibleLevels.forEach(l => l.classList.remove("fade-out"));
+        levels.forEach(l => l.classList.add("fade-in"));
+        setTimeout(() => levels.forEach(l => l.classList.remove("fade-in")), 300);
+        filter.value = "";
+      }, 300);
+      return;
+    }
+    body.classList.add("fadeOutPage");
+    setTimeout(() => window.location.href = backButton.href, 300);
+  });
 
-    return;
-  }
-
-  // 🔹 3. Wirklich zurück zur Index
-  body.classList.add("fadeOutPage");
-  setTimeout(() => window.location.href = backButton.href, 300);
-});
-
-/*HASH / SEARCHBAR*/
+  /*HASH / SEARCHBAR*/
   const hash = window.location.hash.replace("#", "");
   if (hash) {
     const card = document.getElementById(hash);
     if (card) {
       const levelContainer = card.closest(".level-container");
-      if (levelContainer) {
-        showOnlyLevel(levelContainer.dataset.level);
-      }
-
+      if (levelContainer) showOnlyLevel(levelContainer.dataset.level);
       roomList.classList.add("hidden");
       body.classList.remove("preload");
       body.style.opacity = 1;
-
       showCard(card, 50);
       filter.value = hash;
     }
@@ -1310,7 +1248,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 </script>
-
 
 
 <!-- Daten Import Scraper (GitHub) -->
@@ -1527,6 +1464,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
