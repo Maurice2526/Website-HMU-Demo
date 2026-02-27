@@ -1109,43 +1109,41 @@ document.addEventListener("DOMContentLoaded", () => {
       roomDetail.children.length > 0;
 
     // Funktion: neue Einzelansicht-Card erstellen
-    const createSingleViewCard = (sourceCard) => {
-      const newCard = document.createElement("div");
-      newCard.className = "group relative room-card mx-auto max-w-md flex justify-center cursor-pointer";
-
-      // Glow erstellen
-      const glowDiv = document.createElement("div");
-      glowDiv.className = "absolute -inset-0.5 rounded-2xl blur-xl opacity-80 transition";
-
-      // Status-Farbe setzen
-      const status = getStatus(room.bookings || []);
-      const glowColor = status === "belegt" ? "bg-red-400/50" : "bg-green-400/50";
-      glowDiv.classList.add(glowColor);
-
-      // Inner Content kopieren
-      const inner = document.createElement("div");
-      inner.className = "relative bg-[oklch(25%_0.041_260.031)] rounded-2xl p-6 border border-white/5 shadow-lg shadow-black/50 transition-all duration-300";
-
-      // Header kopieren
-      const header = sourceCard.querySelector("div > .flex.items-center.justify-between");
-      if (header) inner.appendChild(header.cloneNode(true));
-
-      // Booking Container kopieren
-      const booking = sourceCard.querySelector(".booking-container");
-      if (booking) inner.appendChild(booking.cloneNode(true));
-
-      newCard.appendChild(inner);
-
-      // Glow an neue Card-Größe anpassen
+    const createSingleViewCard = (sourceCard, status) => {
+    const newCard = document.createElement("div");
+    newCard.className = "group relative room-card mx-auto max-w-md flex justify-center cursor-pointer";
+  
+    // Inner Content kopieren
+    const inner = document.createElement("div");
+    inner.className = "relative bg-[oklch(25%_0.041_260.031)] rounded-2xl p-6 border border-white/5 shadow-lg shadow-black/50 transition-all duration-300";
+  
+    const header = sourceCard.querySelector("div > .flex.items-center.justify-between");
+    if (header) inner.appendChild(header.cloneNode(true));
+  
+    const booking = sourceCard.querySelector(".booking-container");
+    if (booking) inner.appendChild(booking.cloneNode(true));
+  
+    newCard.appendChild(inner);
+  
+    // Glow erstellen
+    const glowDiv = document.createElement("div");
+    glowDiv.className = "absolute -inset-0.5 rounded-2xl blur-xl transition opacity-80";
+  
+    const glowColor = status === "belegt" ? "bg-red-400/50" : "bg-green-400/50";
+    glowDiv.classList.add(glowColor);
+  
+    newCard.appendChild(glowDiv);
+  
+    // Größe anpassen (nach dem Anhängen)
+    setTimeout(() => {
       glowDiv.style.width = newCard.offsetWidth + "px";
       glowDiv.style.height = newCard.offsetHeight + "px";
       glowDiv.style.top = "0px";
       glowDiv.style.left = "0px";
-      
-      newCard.appendChild(glowDiv);
-
-      return newCard;
-    };
+    }, 0);
+  
+    return newCard;
+  };
 
     // Einzelansicht → Karte wechseln
     if (switchingOnly) {
@@ -1468,6 +1466,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
