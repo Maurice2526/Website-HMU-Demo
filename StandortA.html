@@ -1132,91 +1132,71 @@ function showCard(card, delay = 300) {
   history.replaceState(null, "", "#" + card.id);
 
   const switchingOnly =
-    roomList.classList.contains("hidden") &&
-    activeCard !== null;
+    roomList.classList.contains("hidden") && roomDetail.children.length > 0;
 
-  const adjustGlow = (card, isSingleView = true) => {
-  const glow = card.querySelector("div.absolute");
-  if (!glow) return;
+  const createSingleViewCard = (sourceCard) => {
+    // Neue Card erstellen
+    const newCard = document.createElement("div");
+    newCard.className = "group relative room-card mx-auto max-w-md flex justify-center cursor-pointer";
 
-  if (isSingleView) {
-    // Einzelansicht: statischer Glow sichtbar
-    glow.classList.add("opacity-80");
-  } else {
-    // Grid: Hover bleibt
-    glow.classList.remove("opacity-80");
-  }
+    // Glow Div
+    const glowDiv = document.createElement("div");
+    glowDiv.className = "absolute -inset-0.5 rounded-2xl bg-green-400/50 blur-xl opacity-80 transition";
+    newCard.appendChild(glowDiv);
 
-  // Größe anpassen, erst nach Layout
-  requestAnimationFrame(() => {
-    glow.style.width = card.offsetWidth + "px";
-    glow.style.height = card.offsetHeight + "px";
-    glow.style.top = "0px";
-    glow.style.left = "0px";
-  });
-};
+    // Inner Content
+    const inner = document.createElement("div");
+    inner.className = "relative bg-[oklch(25%_0.041_260.031)] rounded-2xl p-6 border border-white/5 shadow-lg shadow-black/50 transition-all duration-300";
+
+    // Header
+    const header = sourceCard.querySelector("div > .flex.items-center.justify-between");
+    if (header) inner.appendChild(header.cloneNode(true));
+
+    // Booking container
+    const booking = sourceCard.querySelector(".booking-container");
+    if (booking) inner.appendChild(booking.cloneNode(true));
+
+    newCard.appendChild(inner);
+
+    // Glow anpassen nach Layout
+    requestAnimationFrame(() => {
+      glowDiv.style.width = newCard.offsetWidth + "px";
+      glowDiv.style.height = newCard.offsetHeight + "px";
+      glowDiv.style.top = "0px";
+      glowDiv.style.left = "0px";
+    });
+
+    return newCard;
+  };
 
   /* ---------- Einzelansicht: Karte wechseln ---------- */
   if (switchingOnly) {
-    if (card === activeCard) return;
-
     roomDetail.classList.add("fade-out");
-
     setTimeout(() => {
-      // alte Karte zurück
-      if (originalParent) {
-        if (originalNextSibling) {
-          originalParent.insertBefore(activeCard, originalNextSibling);
-        } else {
-          originalParent.appendChild(activeCard);
-        }
-      }
-      activeCard.classList.remove("mx-auto", "max-w-md", "flex", "justify-center");
-
-      // neue Karte vorbereiten
-      originalParent = card.parentNode;
-      originalNextSibling = card.nextElementSibling;
-
-      activeCard = card;
-      activeCard.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
-
       roomDetail.innerHTML = "";
-      roomDetail.appendChild(activeCard);
-
-      // Glow anpassen
-      adjustGlow(activeCard, true); 
+      const newCard = createSingleViewCard(card);
+      roomDetail.appendChild(newCard);
 
       roomDetail.classList.remove("fade-out");
       roomDetail.classList.add("fade-in");
       setTimeout(() => roomDetail.classList.remove("fade-in"), 300);
-
     }, 300);
     return;
   }
 
   /* ---------- Grid → Einzelansicht ---------- */
   roomList.classList.add("fade-out");
-
   setTimeout(() => {
     roomList.classList.add("hidden");
     roomList.classList.remove("fade-out");
 
-    originalParent = card.parentNode;
-    originalNextSibling = card.nextElementSibling;
-
-    activeCard = card;
-    activeCard.classList.add("mx-auto", "max-w-md", "flex", "justify-center");
-
     roomDetail.innerHTML = "";
-    roomDetail.appendChild(activeCard);
-
-    // Glow anpassen
-    adjustGlow(activeCard);
+    const newCard = createSingleViewCard(card);
+    roomDetail.appendChild(newCard);
 
     roomDetail.classList.remove("hidden");
     roomDetail.classList.add("fade-in");
     setTimeout(() => roomDetail.classList.remove("fade-in"), 300);
-
   }, delay);
 }
 
@@ -1586,6 +1566,7 @@ document.addEventListener("DOMContentLoaded", loadRoomData);
 </script>
   
 </html>
+
 
 
 
